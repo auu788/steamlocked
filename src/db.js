@@ -11,7 +11,7 @@ connection.connect((err) => {
     if (err)
         throw err;
 
-    console.log("Connected");
+    console.log("[MYSQL] Connected succesfully.");
 })
 
 export default connection;

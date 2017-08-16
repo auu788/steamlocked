@@ -3,6 +3,7 @@ import { escape } from 'mysql';
 import _ from 'lodash';
 
 export const getNewReleases = async (req, res, next) => {
+    console.log(`[REQUEST] ${req.url}`);
     let sqlQuery = 'SELECT * FROM new_releases';
 
     db.query(sqlQuery, (err, results) => {
@@ -14,6 +15,7 @@ export const getNewReleases = async (req, res, next) => {
 }
 
 export const getSearchResults = async (req, res, next) => {
+    console.log(`[REQUEST] ${req.url}`);
     let searchQuery = req.params["searchQuery"];
 
     // Preparing query for SQL's boolean mode search
@@ -45,6 +47,7 @@ export const getSearchResults = async (req, res, next) => {
 }
 
 export const getAppidInfo = async (req, res, next) => {
+    console.log(`[REQUEST] ${req.url}`);
     let appid = req.params['appid'];
 
     let infoQuery = "SELECT DISTINCT name, type, developer, publisher, release_date, dlcforappid \
@@ -82,6 +85,7 @@ export const getAppidInfo = async (req, res, next) => {
 }
 
 export const getList = async (req, res, next) => {
+    console.log(`[REQUEST] ${req.url}`);
     let billingtype = req.query.billingtype.split(',').map(Number).filter(Number.isInteger);
     let country = req.query.country;
 
