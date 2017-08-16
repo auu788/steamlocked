@@ -4,7 +4,9 @@
   "description": "API service for Steamlocked website.",
   "main": "src/server.js",
   "scripts": {
-    "start": "babel-node ./src/server.js"
+    "start": "babel-node ./src/server.js",
+    "build": "babel src -d dist",
+    "serve": "node dist/server.js"
   },
   "repository": {
     "type": "git",
