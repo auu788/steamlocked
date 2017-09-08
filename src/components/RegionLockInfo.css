@@ -1,0 +1,104 @@
+#region-lock-info {
+    margin-top: 25px;
+    background-color: #00173A;
+    border-radius: 20px;
+    padding: 25px 0 25px 0;
+    width: 100%;
+}
+
+#country-selector {
+    width: 20%;
+    min-width: 250px; /* TO CHANGE */
+    margin: 0 auto;
+}
+
+#country-selector > span {
+    display: block;
+    text-align: center;
+    font-size: 25px;
+    color: white;
+}
+
+.Select-control {
+    background-color: #ABBDD9 !important;
+    border: none !important;  
+}
+
+.Select {
+    margin-top: 5px;
+}
+
+.Select-value-label {
+    display: block;
+    text-align: center;
+    font-size: 25px;
+}
+
+/*
+    VIEW
+*/
+
+#no-region-lock {
+    display: block;
+    margin: 30px auto 0;
+    background-color: #4c6b22;
+    width: 40%;
+    padding: 20px;
+    text-align: center;
+    border-radius: 10px;
+    font-size: 25px;
+    color: white;
+}
+
+.locked-countries-wrapper {
+    margin: 40px auto 0;
+    display: block;
+    width: 90%;
+    border: 5px solid #5F0A16;
+    border-radius: 10px;
+}
+
+.locked-countries-wrapper > span {
+    display: block;
+    text-align: center;
+    font-size: 25px;
+    background-color: #5F0A16;
+    color: white;
+}
+
+.locked-countries {
+    display: block;
+    width: 100%;
+    border-top: 5px solid #5F0A16;
+    padding: 0px 0 15px 0;
+}
+
+.locked-countries > span {
+    display: block;
+    text-align: center;
+    color: white;
+    font-size: 22px;
+    border-bottom: 1px dashed grey;
+    padding: 5px;
+}
+
+.countries {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center; 
+    margin-top: 15px;
+}
+
+.countries > span {
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 3px;
+    padding: 5px;
+    margin: 3px;
+    font-size: 16px;
+    opacity: 0.8;
+}
+
+.countries > span > img {
+    margin-right: 3px;
+    opacity: 0.8;
+}

@@ -1,0 +1,138 @@
+@media screen and (max-width: 940px) {
+    #app-info-wrapper {
+        width: 100%;
+        margin-top: 50px;
+    }
+
+    #app-info {
+        background-color: #00173A;
+        
+        width: 100%;
+        color: white;
+    }
+
+    #app-info > img {
+        width: 100%;
+        height: auto;
+        margin: 0 auto;
+        clear: both;
+    }
+
+    #app-details {
+        clear: both;
+    }
+
+    #app-details > #title {
+        display: block;
+        font-size: 25px;
+        text-align: center;
+    }
+
+    #app-details > #type {
+        display: block;
+        font-size: 14px;
+        text-align: center;
+    }
+
+    #app-details > table {
+        margin: 15px auto;
+        width: 100%;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    #app-details > table td:not(.prop-title) {
+        text-align: right;
+    }
+
+    #app-details a {
+        color: white;
+        text-decoration: none;
+    }
+
+    #app-details a:hover {
+        text-decoration: underline;
+    }
+}
+
+@media screen and (min-width: 941px) {
+    #app-info-wrapper {
+        margin-top: 50px;
+        width: 100%;
+        margin: 0 auto;
+    }
+    
+    #app-info {
+        margin-top: 50px;
+        display: block;
+        width: 100%;
+        height: 210px;
+        border-radius: 20px;
+        background-color: #00173A;
+    }
+    
+    #app-details {
+        width: 55%;
+        float: right;
+        margin-left: 20px;
+        color: white;
+        padding-top: 10px;
+    }
+    
+    #app-details > #title {
+        display: block;
+        font-size: 30px;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+    
+    #app-details > #type { 
+        font-size: 13px;
+        margin-left: 5px;
+        display: block;
+    }
+    
+    #app-details > table {
+        margin-top: 20px;
+    }
+    
+    #app-details > table > tbody > tr > .prop-title {
+        width: 130px;
+    }
+    
+    #app-details a {
+        color: white;
+        text-decoration: none;
+    }
+    
+    #app-details a:hover {
+        text-decoration: underline;
+    }
+    
+    #app-info > img {
+        width: 40%;
+        min-width: 400px;
+        float: left;
+        height: 100%;
+        border-radius: 20px 0 0 20px;
+    }
+}
+
+@media screen and (min-width: 560px) and (max-width: 940px) {
+    #app-info > img {
+        max-width: 460px;
+        display: block;
+    }
+
+    #app-details > table {
+        padding-left: calc((100% - 460px) / 2);
+        padding-right: calc((100% - 460px) / 2);
+    }
+}
+
+@media screen and (min-width: 1140px) {
+    #app-info-wrapper {
+        width: 1040px;
+    }
+}
