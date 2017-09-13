@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { Redirect  } from 'react-router-dom';
 import Navbar from './Navbar';
 
+import NewReleases from './NewReleases';
+import Footer from './Footer';
 import './Home.css';
 
 class Home extends Component {
@@ -35,7 +37,8 @@ class Home extends Component {
             <div id="wrapper">
                 { this.redirect() }
                 <Navbar searchQuery={ this.onInputChange } />
-                <div>DOMEK</div>
+                <NewReleases />
+                <Footer />
             </div>
         );
     }

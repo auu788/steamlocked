@@ -24,7 +24,7 @@ export const COUNTRIES_NAMES_OBJECT = {"AF":"Afghanistan",
 "BJ":"Benin",
 "BM":"Bermuda",
 "BT":"Bhutan",
-"BO":"Plurinational State of Bolivia",
+"BO":"Bolivia",
 "BQ":"Sint Eustatius and Saba Bonaire",
 "BA":"Bosnia and Herzegovina",
 "BW":"Botswana",
@@ -49,7 +49,7 @@ export const COUNTRIES_NAMES_OBJECT = {"AF":"Afghanistan",
 "CO":"Colombia",
 "KM":"Comoros",
 "CG":"Congo",
-"CD":"The Democratic Republic of the Congo",
+"CD":"Congo",
 "CK":"Cook Islands",
 "CR":"Costa Rica",
 "CI":"Côte d'Ivoire",
@@ -95,14 +95,14 @@ export const COUNTRIES_NAMES_OBJECT = {"AF":"Afghanistan",
 "GY":"Guyana",
 "HT":"Haiti",
 "HM":"Heard Island and McDonald Islands",
-"VA":"Holy See (Vatican City State)",
+"VA":"Vatican City",
 "HN":"Honduras",
 "HK":"Hong Kong",
 "HU":"Hungary",
 "IS":"Iceland",
 "IN":"India",
 "ID":"Indonesia",
-"IR":"Islamic Republic of Iran",
+"IR":"Iran",
 "IQ":"Iraq",
 "IE":"Ireland",
 "IM":"Isle of Man",
@@ -115,11 +115,11 @@ export const COUNTRIES_NAMES_OBJECT = {"AF":"Afghanistan",
 "KZ":"Kazakhstan",
 "KE":"Kenya",
 "KI":"Kiribati",
-"KP":"Democratic People's Republic of Korea",
-"KR":"Republic of Korea",
+"KP":"North Korea",
+"KR":"South Korea",
 "KW":"Kuwait",
 "KG":"Kyrgyzstan",
-"LA":"Lao People's Democratic Republic",
+"LA":"Laos",
 "LV":"Latvia",
 "LB":"Lebanon",
 "LS":"Lesotho",
@@ -129,7 +129,7 @@ export const COUNTRIES_NAMES_OBJECT = {"AF":"Afghanistan",
 "LT":"Lithuania",
 "LU":"Luxembourg",
 "MO":"Macao",
-"MK":"The Former Yugoslav Republic of Macedonia",
+"MK":"Macedonia",
 "MG":"Madagascar",
 "MW":"Malawi",
 "MY":"Malaysia",
@@ -142,8 +142,8 @@ export const COUNTRIES_NAMES_OBJECT = {"AF":"Afghanistan",
 "MU":"Mauritius",
 "YT":"Mayotte",
 "MX":"Mexico",
-"FM":"Federated States of Micronesia",
-"MD":"Republic of Moldova",
+"FM":"Micronesia",
+"MD":"Moldova",
 "MC":"Monaco",
 "MN":"Mongolia",
 "ME":"Montenegro",
@@ -167,7 +167,7 @@ export const COUNTRIES_NAMES_OBJECT = {"AF":"Afghanistan",
 "OM":"Oman",
 "PK":"Pakistan",
 "PW":"Palau",
-"PS":"State of Palestine",
+"PS":"Palestine",
 "PA":"Panama",
 "PG":"Papua New Guinea",
 "PY":"Paraguay",
@@ -180,7 +180,7 @@ export const COUNTRIES_NAMES_OBJECT = {"AF":"Afghanistan",
 "QA":"Qatar",
 "RE":"Réunion",
 "RO":"Romania",
-"RU":"Russian Federation",
+"RU":"Russia",
 "RW":"Rwanda",
 "BL":"Saint Barthélemy",
 "SH":"Ascension and Tristan da Cunha Saint Helena",
@@ -214,10 +214,10 @@ export const COUNTRIES_NAMES_OBJECT = {"AF":"Afghanistan",
 "SZ":"Swaziland",
 "SE":"Sweden",
 "CH":"Switzerland",
-"SY":"Syrian Arab Republic",
-"TW":"Province of China - Taiwan",
+"SY":"Syria",
+"TW":"Taiwan",
 "TJ":"Tajikistan",
-"TZ":"United Republic of Tanzania",
+"TZ":"Tanzania",
 "TH":"Thailand",
 "TL":"Timor-Leste",
 "TG":"Togo",
@@ -238,7 +238,7 @@ export const COUNTRIES_NAMES_OBJECT = {"AF":"Afghanistan",
 "UY":"Uruguay",
 "UZ":"Uzbekistan",
 "VU":"Vanuatu",
-"VE":"Bolivarian Republic of Venezuela",
+"VE":"Venezuela",
 "VN":"Vietnam",
 "VG":"British Virgin Islands",
 "VI":"U.S. Virgin Islands",
@@ -355,7 +355,7 @@ export const COUNTRIES_LIST_ARRAY = [
   },
   {
     "value": "BO",
-    "label": "Plurinational State of Bolivia"
+    "label": "Bolivia"
   },
   {
     "value": "BQ",
@@ -455,7 +455,7 @@ export const COUNTRIES_LIST_ARRAY = [
   },
   {
     "value": "CD",
-    "label": "The Democratic Republic of the Congo"
+    "label": "Congo"
   },
   {
     "value": "CK",
@@ -639,7 +639,7 @@ export const COUNTRIES_LIST_ARRAY = [
   },
   {
     "value": "VA",
-    "label": "Holy See (Vatican City State)"
+    "label": "Vatican City"
   },
   {
     "value": "HN",
@@ -667,7 +667,7 @@ export const COUNTRIES_LIST_ARRAY = [
   },
   {
     "value": "IR",
-    "label": "Islamic Republic of Iran"
+    "label": "Iran"
   },
   {
     "value": "IQ",
@@ -719,11 +719,11 @@ export const COUNTRIES_LIST_ARRAY = [
   },
   {
     "value": "KP",
-    "label": "Democratic People's Republic of Korea"
+    "label": "North Korea"
   },
   {
     "value": "KR",
-    "label": "Republic of Korea"
+    "label": "South Korea"
   },
   {
     "value": "KW",
@@ -735,7 +735,7 @@ export const COUNTRIES_LIST_ARRAY = [
   },
   {
     "value": "LA",
-    "label": "Lao People's Democratic Republic"
+    "label": "Laos"
   },
   {
     "value": "LV",
@@ -775,7 +775,7 @@ export const COUNTRIES_LIST_ARRAY = [
   },
   {
     "value": "MK",
-    "label": "The Former Yugoslav Republic of Macedonia"
+    "label": "Macedonia"
   },
   {
     "value": "MG",
@@ -827,11 +827,11 @@ export const COUNTRIES_LIST_ARRAY = [
   },
   {
     "value": "FM",
-    "label": "Federated States of Micronesia"
+    "label": "Micronesia"
   },
   {
     "value": "MD",
-    "label": "Republic of Moldova"
+    "label": "Moldova"
   },
   {
     "value": "MC",
@@ -927,7 +927,7 @@ export const COUNTRIES_LIST_ARRAY = [
   },
   {
     "value": "PS",
-    "label": "State of Palestine"
+    "label": "Palestine"
   },
   {
     "value": "PA",
@@ -979,7 +979,7 @@ export const COUNTRIES_LIST_ARRAY = [
   },
   {
     "value": "RU",
-    "label": "Russian Federation"
+    "label": "Russia"
   },
   {
     "value": "RW",
@@ -1115,11 +1115,11 @@ export const COUNTRIES_LIST_ARRAY = [
   },
   {
     "value": "SY",
-    "label": "Syrian Arab Republic"
+    "label": "Syria"
   },
   {
     "value": "TW",
-    "label": "Province of China - Taiwan"
+    "label": "Taiwan"
   },
   {
     "value": "TJ",
@@ -1127,7 +1127,7 @@ export const COUNTRIES_LIST_ARRAY = [
   },
   {
     "value": "TZ",
-    "label": "United Republic of Tanzania"
+    "label": "Tanzania"
   },
   {
     "value": "TH",
@@ -1211,7 +1211,7 @@ export const COUNTRIES_LIST_ARRAY = [
   },
   {
     "value": "VE",
-    "label": "Bolivarian Republic of Venezuela"
+    "label": "Venezuela"
   },
   {
     "value": "VN",

@@ -49,7 +49,7 @@ class AppPageContainer extends Component {
         }
 
         return (
-            <div>
+            <div id="wrapper">
                 <Navbar
                     inputValue={ this.state.searchQuery } 
                     searchQuery={ this.onInputChange }

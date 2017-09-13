@@ -53,29 +53,29 @@ const RegionLockInfoView = (props) => {
                 {props.data.keyLockedCountries.length > 0 &&
                     <div className="locked-countries">
                         <span>There is a risk you won't be able to <span style={{color: "#EFBE74"}}>ACTIVATE</span> your copy from these countries</span>
-                        <div className="countries">
+                        <ul className="countries">
                             {props.data.keyLockedCountries.map((country) => {
-                                return <span key={country.code}><Flag code={country.code} height="11" />{country.name}</span>;
+                                return <li key={country.code}><Flag code={country.code} height="15" className="flag" /><span>{country.name}</span></li>;
                             })}
-                        </div>
+                        </ul>
                     </div>}
                 {props.data.keyRunLockedCountries.length > 0 &&
                     <div className="locked-countries">
                         <span>There is a risk you won't be able to <span style={{color: "#EFBE74"}}>ACTIVATE</span> and <span style={{color: "#EFBE74"}}>RUN</span> your copy from these countries</span>
-                        <div className="countries">
+                        <ul className="countries">
                             {props.data.keyRunLockedCountries.map((country) => {
-                                return <span key={country.code}><Flag code={country.code} height="11" />{country.name}</span>;
+                                return <li key={country.code}><Flag code={country.code} height="15" className="flag" /><span>{country.name}</span></li>;
                             })}
-                        </div>
+                        </ul>
                     </div>}
                 {props.data.keyBannedCountries.length > 0 &&
                     <div className="locked-countries">
                         <span>Some versions of the game may be <span style={{color: "#EFBE74"}}>banned</span> in your and these countries</span>
-                        <div className="countries">
+                        <ul className="countries">
                             {props.data.keyBannedCountries.map((country) => {
-                                return <span key={country.code}><Flag code={country.code} height="11" />{country.name}</span>;
+                                return <li key={country.code}><Flag code={country.code} height="15" className="flag" /><span>{country.name}</span></li>;
                             })}
-                        </div>
+                        </ul>
                     </div>}
             </div>} 
         </div>
@@ -196,7 +196,6 @@ class RegionLockInfoWrapper extends Component {
             }
 
             if (one.onlyallowrunincountries) {
-                
 
                 if (!_.includes(one.onlyallowrunincountries, userCountryCode)) {
                     regionLocked = true;

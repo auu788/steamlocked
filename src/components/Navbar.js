@@ -12,6 +12,7 @@ class Navbar extends Component {
         };
 
         this.onInputChange = this.onInputChange.bind(this);
+        this.clearInput = this.clearInput.bind(this);
     }
 
     componentDidMount() {
@@ -30,19 +31,28 @@ class Navbar extends Component {
         this.props.searchQuery(event.target.value);
     }
 
+    clearInput() {
+        this.setState({searchQuery: ''});
+        this.props.searchQuery('');
+    }
+
     render() {
         return (
             <div id="navbar">
-                <input 
-                    id="search-input" 
-                    value={ this.state.searchQuery } 
-                    onChange={ this.onInputChange } 
-                    type="text" 
-                    autoComplete="off" 
-                    autoCorrect="off" 
-                    spellCheck="false" 
-                    autoFocus>
-                </input>              
+                <div id="input-group">
+                    <input 
+                        id="search-input" 
+                        value={ this.state.searchQuery } 
+                        onChange={ this.onInputChange } 
+                        type="text" 
+                        autoComplete="off" 
+                        autoCorrect="off" 
+                        spellCheck="false" 
+                        autoFocus>
+                    </input>
+                    {this.state.searchQuery.length > 0 &&
+                        <button id="clear-button" onClick={this.clearInput}>x</button>}
+                </div>
                 <Link to="/list" id="list-button">Region locked games list</Link>
             </div>
         );

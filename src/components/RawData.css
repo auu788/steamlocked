@@ -1,8 +1,7 @@
 #raw-data-wrapper {
     margin-top: 30px;
     background-color: #00173A;
-    border-radius: 20px;
-    color: white;
+    border-radius: 5px;
     width: 100%;
     padding: 25px 0 25px 0;
 }
@@ -10,7 +9,7 @@
 #raw-data-wrapper > span {
     display: block;
     text-align: center;
-    font-size: 30px;
+    font-size: 25px;
 }
 
 #raw-data-table {
@@ -32,6 +31,7 @@
     padding: 5px;
 }
 
+
 .raw-data-element:nth-child(odd) {
     background-color: rgb(0, 29, 73);
 }
@@ -40,3 +40,4 @@
     width: 300px;
     text-align: left;
 }
+

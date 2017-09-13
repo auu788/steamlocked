@@ -5,6 +5,7 @@ import _ from 'lodash';
 import { fetchSearchResults } from '../actions/index';
 import Navbar from '../components/Navbar';
 import SearchResults from '../components/SearchResults';
+import Footer from '../components/Footer';
 
 class SearchPageContainer extends Component {
     constructor(props) {
@@ -85,6 +86,7 @@ class SearchPageContainer extends Component {
                     searchQuery={ debounceOnInputChange }
                 /> }
                 <SearchResults results={ this.props.searchResults.payload } />
+                <Footer />
             </div>
         );
     }

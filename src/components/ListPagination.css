@@ -1,0 +1,39 @@
+.hidden-button {
+    visibility: hidden;
+}
+
+#list-data {
+    list-style: none;
+    min-height: 795px;
+    padding-left: 0;
+    margin: 0;
+}
+
+#list-data > a > li {
+    height: 45px;
+    background-color: #10315E;
+    margin-bottom: 3px;
+    font-size: 25px;
+}
+
+#nav-controls {
+    width: 50%;
+    margin: 30px auto 0;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.nav-button {
+    background: none;
+    padding: 5px;
+    border: 1px solid white;
+    border-radius: 5px;
+    color: white;
+    font-size: 20px;
+}
+
+.current-page {
+    border: none;
+    font-size: 30px;
+}

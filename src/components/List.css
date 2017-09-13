@@ -1,0 +1,17 @@
+#list-wrapper {
+    width: 1040px;
+    margin: 40px auto;
+}
+
+#list-control {
+    background-color: #0B2548;
+    border-radius: 5px;
+    height: 100px;
+}
+
+#list-results {
+    margin-top: 30px;
+    border-radius: 5px;
+    background-color: #0B2548;
+    padding: 50px;
+}

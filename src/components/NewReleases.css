@@ -1,0 +1,48 @@
+#new-releases-wrapper {
+    width: 1040px;
+    margin: 50px auto;
+    background-color: #0B2548;
+    border-radius: 5px;
+    padding-bottom: 20px;
+}
+
+#new-releases-wrapper > h1 {
+    text-align: center;
+}
+
+#new-releases-table {
+    width: 95%;
+    margin: 0 auto;
+    border-spacing: 0;
+}
+
+#new-releases-table > thead, thead > tr {
+    height: 50px;
+    background-color: #1A2F4C;
+}
+
+/* td {
+    border-bottom: 1px solid white;
+} */
+
+tr:hover {
+    background-color: #293A4F;
+}
+
+.img-row {
+    padding: 0;
+    width: 50px;
+}
+
+.name-row {
+    padding-left: 15px;
+}
+
+.lock-row {
+    width: 150px;
+}
+
+.img-row > a > img {
+    display: block;
+    width: 100%;
+}

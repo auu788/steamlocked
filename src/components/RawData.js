@@ -13,7 +13,7 @@ const RawData = (props) => {
                             <tbody>
                                 <tr>
                                     <th>SubID:</th>
-                                    <td>{pack.subid}</td>
+                                    <td>{pack.subid} | <a href={`https://steamdb.info/sub/${pack.subid}`}>SteamDB</a></td>
                                 </tr>
                                 <tr>
                                     <th>Package name:</th>
