@@ -4,8 +4,10 @@ import _ from 'lodash';
 
 export const getNewReleases = async (req, res, next) => {
     console.log(`[REQUEST] ${req.url}`);
+	res.header("Access-Control-Allow-Origin", "*");
+	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     let sqlQuery = 'SELECT * FROM new_releases';
-
+	
     db.query(sqlQuery, (err, results) => {
         res.status(200).json({
             "success": true,
@@ -16,6 +18,8 @@ export const getNewReleases = async (req, res, next) => {
 
 export const getSearchResults = async (req, res, next) => {
     console.log(`[REQUEST] ${req.url}`);
+	res.header("Access-Control-Allow-Origin", "*");
+	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     let searchQuery = req.params["searchQuery"];
 
     // Preparing query for SQL's boolean mode search
@@ -26,7 +30,7 @@ export const getSearchResults = async (req, res, next) => {
                     FROM apps \
                     WHERE (releasestate <> 'prerelease' OR releasestate IS NULL) AND \
                         (appid = ? OR name LIKE ? OR MATCH(name) AGAINST (? IN BOOLEAN MODE)) \
-                    ORDER BY MATCH(name) AGAINST (? IN BOOLEAN MODE) DESC";
+                    ORDER BY MATCH(name) AGAINST (? IN BOOLEAN MODE) DESC LIMIT 150";
 
     db.query(sqlQuery, [searchQuery, '%'+searchQuery+'%', preparedQuery, preparedQuery], (err, results) => {
         if (err) throw err;
@@ -48,9 +52,11 @@ export const getSearchResults = async (req, res, next) => {
 
 export const getAppidInfo = async (req, res, next) => {
     console.log(`[REQUEST] ${req.url}`);
-    let appid = req.params['appid'];
+	res.header("Access-Control-Allow-Origin", "*");
+	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    const appid = req.params['appid'];
 
-    let infoQuery = "SELECT DISTINCT name, type, developer, publisher, release_date, dlcforappid \
+    let infoQuery = "SELECT DISTINCT appid, name, type, developer, publisher, release_date, dlcforappid, 'base_name' \
                     FROM apps \
                     WHERE (releasestate<>'prerelease' or releasestate IS NULL) AND appid = ?";
     
@@ -60,7 +66,24 @@ export const getAppidInfo = async (req, res, next) => {
 
     db.query(infoQuery, appid, (err, appResults) => {
         if (err) throw err;
-
+		
+		if (appResults[0].type === 'DLC') {
+			const dlcForAppid = appResults[0].dlcforappid;
+			
+			let baseNameForDlcQuery =	"SELECT name \
+										FROM apps \
+										WHERE appid = ? AND type = 'Game'";
+			
+			db.query(baseNameForDlcQuery, dlcForAppid, (err, baseNameResult) => {
+				if (err) throw err;
+				
+				appResults[0]["base_name"] = baseNameResult[0].name;
+			});
+		}
+		else {
+			appResults[0]["base_name"] = null;
+		}
+		
         if (appResults.length === 0) {
             res.status(400).json({
                 "success": false,
@@ -76,7 +99,6 @@ export const getAppidInfo = async (req, res, next) => {
 
                 res.status(200).json({
                     "success": true,
-                    "appid": appid,
                     "payload": appResults
                 });
             });
@@ -86,6 +108,8 @@ export const getAppidInfo = async (req, res, next) => {
 
 export const getList = async (req, res, next) => {
     console.log(`[REQUEST] ${req.url}`);
+	res.header("Access-Control-Allow-Origin", "*");
+	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     let billingtype = req.query.billingtype.split(',').map(Number).filter(Number.isInteger);
     let country = req.query.country;
 
