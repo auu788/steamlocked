@@ -1,21 +1,20 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import _ from 'lodash';
+import { Helmet } from 'react-helmet';
 
 import { fetchAppInfo } from '../actions/index';
 import Navbar from '../components/Navbar';
 import AppPage from '../components/AppPage';
+import ErrorPage from '../components/ErrorPage';
 
 class AppPageContainer extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            appid: this.props.match.params.appid,
-            searchQuery: ''
+            appid: this.props.match.params.appid
         }
-
-        this.onInputChange = this.onInputChange.bind(this);
     }
 
     componentDidMount() {
@@ -33,27 +32,20 @@ class AppPageContainer extends Component {
         }
     }
 
-    onInputChange(searchQuery) {
-        this.setState({
-            searchQuery
-        });
-
-        if (searchQuery.length > 2) {
-            this.props.history.push(`/search/${searchQuery}`);
-        }
-    }
-
     render() {
         if (!this.props.appInfo || _.isEmpty(this.props.appInfo)) {
-            return null;
+            return (
+                <ErrorPage />
+            );
         }
 
         return (
             <div id="wrapper">
-                <Navbar
-                    inputValue={ this.state.searchQuery } 
-                    searchQuery={ this.onInputChange }
-                />
+                <Helmet>
+                    <title>{this.props.appInfo.payload[0].name} · AppID: {this.state.appid} · Steam Locked</title>
+                    <meta name="description" content={`Find out if ${this.props.appInfo.payload[0].name} [AppID: ${this.state.appid}] has any region locks or restrictions.`} />
+                </Helmet>
+                <Navbar />
                 <AppPage data={ this.props.appInfo.payload }/>
             </div>
         );

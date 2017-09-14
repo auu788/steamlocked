@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import _ from 'lodash';
+import { Helmet } from 'react-helmet';
 
 import { fetchSearchResults } from '../actions/index';
 import Navbar from '../components/Navbar';
@@ -47,7 +48,7 @@ class SearchPageContainer extends Component {
 
     onInputChange(searchQuery) {
         const { history } = this.props;
-
+        
         if (searchQuery.length < 3) {
             history.push('/');
         } 
@@ -80,6 +81,10 @@ class SearchPageContainer extends Component {
         
         return (
             <div id="wrapper">
+                <Helmet>
+                    <title>Search results for '{this.state.searchQuery}' · Steam Locked</title>
+                    <meta name="description" content={`Search results for '${this.state.searchQuery}'. Find out if the Steam game you want to buy has any region locks or restrictions.`} />
+                </Helmet>
                 { this.state.searchQuery.length > 0 &&
                 <Navbar
                     inputValue={ this.state.searchQuery } 

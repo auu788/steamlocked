@@ -1,9 +1,15 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
+import { withRouter, Link } from 'react-router-dom';
 
 import './Navbar.css';
 
-class Navbar extends Component {
+const Navbar = withRouter((props) => {
+    return (
+        <NavbarWithRoute {...props} />
+    );
+});
+
+class NavbarWithRoute extends Component {
     constructor(props) {
         super(props);
 
@@ -28,7 +34,14 @@ class Navbar extends Component {
             searchQuery: event.target.value
         });
         
-        this.props.searchQuery(event.target.value);
+        if (this.props.location.pathname.startsWith('/search')) {
+            this.props.searchQuery(event.target.value);
+
+        } else {
+            if (event.target.value.length > 2) {
+                this.props.history.push('/search/' + event.target.value);
+            }
+        }
     }
 
     clearInput() {
@@ -53,7 +66,9 @@ class Navbar extends Component {
                     {this.state.searchQuery.length > 0 &&
                         <button id="clear-button" onClick={this.clearInput}>x</button>}
                 </div>
-                <Link to="/list" id="list-button">Region locked games list</Link>
+                {this.props.location.pathname !== '/' &&
+                    <Link to="/" id="home-button" className="button">Home</Link>}
+                <Link to="/list" id="list-button" className="button">Region locked games list</Link>
             </div>
         );
     }

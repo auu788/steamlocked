@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import _ from 'lodash';
+import { Helmet } from 'react-helmet';
 
 import { fetchList } from '../actions/index';
 import Navbar from '../components/Navbar';
@@ -25,7 +26,6 @@ class ListPageContainer extends Component {
     }
 
     onCountryChange(country) {
-        console.log(country);
         this.props.fetchList(country);
         this.setState({
             country
@@ -39,7 +39,7 @@ class ListPageContainer extends Component {
     }
 
     prepareGamesList() {
-        return  (_.filter(this.props.listResults.payload, (elem) => {
+        return (_.filter(this.props.listResults.payload, (elem) => {
             if (elem.name.toLowerCase().includes(this.state.filterQuery.toLowerCase())) {
                 return elem;
             }
@@ -49,6 +49,10 @@ class ListPageContainer extends Component {
     render() {
         return (
             <div id="wrapper">
+                <Helmet>
+                    <title>List of region locked games · Steam Locked</title>
+                    <meta name="description" content="Check out list of region locked games by country." />
+                </Helmet>
                 <Navbar />
                 <List filterQuery={this.onFilterInputChange} country={this.onCountryChange} gamesList={this.prepareGamesList()}/>
                 <Footer />

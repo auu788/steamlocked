@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import ReactImageFallback from 'react-image-fallback';
 
 import './ListPagination.css';
 
@@ -17,30 +18,36 @@ class ListPagination extends Component {
         this.changePage = this.changePage.bind(this);
     }
 
+    componentWillMount() {
+        this.calculatePages(this.props);
+    }
+
     componentWillReceiveProps(nextProps) {
-         
-        let pageSize = nextProps.pageSize || this.state.pageSize;
+        this.calculatePages(nextProps);
+    }
+
+    calculatePages(propsData) {
+        let pageSize = propsData.pageSize || this.state.pageSize;
         let groupedData = {};
         let tempArray = [];
-        for (var i = 1, j = 1; i <= nextProps.data.length; i++) {
+        for (var i = 1, j = 1; i <= propsData.data.length; i++) {
             if (i % pageSize === 0) {
-                tempArray.push(nextProps.data[i-1]);
+                tempArray.push(propsData.data[i-1]);
                 groupedData[j] = tempArray;
                 tempArray = [];
                 j++;
 
-            } else if (i === nextProps.data.length) {
-                tempArray.push(nextProps.data[i-1]);
+            } else if (i === propsData.data.length) {
+                tempArray.push(propsData.data[i-1]);
                 groupedData[j] = tempArray;   
 
             } else {
-                tempArray.push(nextProps.data[i-1]);
+                tempArray.push(propsData.data[i-1]);
             }
         }
 
-        let lastPage = (nextProps.data.length % pageSize === 0) ? (nextProps.data.length / pageSize) : parseInt((nextProps.data.length / pageSize) + 1, 10)
+        let lastPage = (propsData.data.length % pageSize === 0) ? (propsData.data.length / pageSize) : parseInt((propsData.data.length / pageSize) + 1, 10)
 
-        console.log("PO", groupedData);
         this.setState({
             currentPage: 1,
             data: groupedData,
@@ -53,26 +60,37 @@ class ListPagination extends Component {
         this.setState({
             currentPage: nextPage
         });
+
+        const listOffsetY = document.querySelector('#paginated-list').offsetTop;
+        window.scrollTo(0, listOffsetY);
     }
 
     render() {
-        console.log(this.state.data);
-        if (this.state.data && !(1 in this.state.data)) {
-            return (
-                <div id="paginated-list">
-                    <span id="no-results">No results</span>
-                </div>);
+        let heightStyle = {}
+
+        if (this.state.data && this.state.data[this.state.currentPage].length === this.state.pageSize) {
+            heightStyle = {
+                minHeight: "780px"
+            }
+        } else {
+            heightStyle = {
+                minHeight: "auto"
+            }
         }
 
         return (
             <div id="paginated-list">
-                <ul id="list-data">
+                <ul id="list-data" style={heightStyle}>
                     {this.state.data &&
                         this.state.data[this.state.currentPage].map((elem) => {
                             return (
-                                <Link to={`/app/${elem.appid}`}>
-                                    <li key={elem.appid}>
-                                        <img alt={elem.name} src={`https://steamcdn-a.akamaihd.net/steam/apps/${elem.appid}/capsule_sm_120.jpg`} />
+                                <Link key={elem.appid} to={`/app/${elem.appid}`}>
+                                    <li>
+                                        <ReactImageFallback
+                                            src={`https://steamcdn-a.akamaihd.net/steam/apps/${elem.appid}/capsule_sm_120.jpg`}
+                                            fallbackImage={require('../images/error-120.jpg')}
+                                            initialImage={require('../images/spinner.svg')}
+                                            alt={elem.name} />
                                         <span>{elem.name}</span>
                                     </li>
                                 </Link>

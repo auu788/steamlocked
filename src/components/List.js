@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Select from 'react-select';
 
+import Note from './Note';
 import ListPagination from './ListPagination';
 import { COUNTRIES_LIST_ARRAY } from '../utils/consts';
 import './List.css';
@@ -19,8 +20,9 @@ class List extends Component {
         this.onCountryChange = this.onCountryChange.bind(this);
     }
 
-    shouldComponentUpdate(nextProps) {
-        if (JSON.stringify(nextProps.gamesList) === JSON.stringify(this.props.gamesList)) {
+    shouldComponentUpdate(nextProps, nextState) {
+        if ((JSON.stringify(nextProps.gamesList) === JSON.stringify(this.props.gamesList)) &&
+            (this.state.inputValue === nextState.inputValue)) {
             return false;
         }
 
@@ -28,10 +30,10 @@ class List extends Component {
     }
 
     onFilterInputChange(filterQuery) {
-        this.props.filterQuery(filterQuery.target.value);
         this.setState({
             inputValue: filterQuery.target.value
-        })
+        });
+        this.props.filterQuery(filterQuery.target.value);
     }
 
     onCountryChange(selectedCountry) {
@@ -42,23 +44,34 @@ class List extends Component {
     }
 
     render() {
-        console.log(this.props.gamesList);
-        
         return (
             <div id="list-wrapper">
-                <div id="list-control">
-                    <input value={this.state.inputValue} onChange={this.onFilterInputChange} />
-                    <Select
-                        options={this.state.selectorCountriesList}
-                        value={this.state.shopCountryCode}
-                        clearable={false}
-                        onChange={this.onCountryChange}
-                    />
+                <div id="list-control-wrapper">
+                    <div id="list-control-filter">
+                        <span>Filter games</span>
+                        <input value={this.state.inputValue} onChange={this.onFilterInputChange} />
+                    </div>
+                    <div id="list-control-select">
+                        <span>Select country</span>
+                        <Select
+                            options={this.state.selectorCountriesList}
+                            value={this.state.shopCountryCode}
+                            clearable={false}
+                            onChange={this.onCountryChange}
+                        />
+                    </div>
                 </div>
-
-                <div id="list-results">
-                    <ListPagination data={this.props.gamesList} pageSize={15} />
-                </div>
+                
+                <Note type='list' />
+                {this.props.gamesList.length === 0 &&
+                    <div id="list-results">
+                        <span id="no-results">No results</span>
+                    </div>}
+                {this.props.gamesList.length > 0 &&
+                    <div id="list-results">
+                        <span id="list-header">{this.props.gamesList.length} Region Locked Games</span>
+                        <ListPagination data={this.props.gamesList} pageSize={20} />
+                    </div>}
             </div>
         );
     }

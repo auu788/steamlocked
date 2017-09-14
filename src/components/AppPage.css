@@ -5,7 +5,7 @@
     }
 
     #app-info {
-        background-color: #00173A;
+        background-color: #0B2548;
         width: 100%;
     }
 
@@ -66,7 +66,7 @@
         width: 100%;
         height: 210px;
         border-radius: 5px;
-        background-color: #00173A;
+        background-color: #0B2548;
     }
     
     #app-details {
@@ -132,65 +132,4 @@
     #app-info-wrapper {
         width: 1040px;
     }
-}
-
-/*
-    NoteDiv
-*/
-
-@media screen and (min-width: 1140px) {
-    #general-info-wrapper {
-        width: 1040px;
-    }
-}
-#general-info-wrapper {
-    width: 100%;
-    margin-top: 30px;
-    border-radius: 5px;
-    background-color: #00173A;
-}
-
-#info-header {
-    position: relative;
-}
-
-#general-info-wrapper > #content {
-    width: 90%;
-    margin: 0 auto;
-    border-top: 1px solid rgba(255, 255, 255, 0.85);
-}
-
-#info-header > .expand {
-    position: absolute;
-    right: 5%;
-    top: 0;
-    line-height: 50px;
-    font-size: 40px;
-    background: none;
-    color: rgba(255, 255, 255, 0.85);
-    border:none;
-    transition: color .3s ease-out;
-}
-
-#info-header > .expand:hover {
-    color: #4c6b22;
-}
-
-#info-header > .expand:focus {
-    outline: none;
-}
-
-#info-header > span {
-    padding: 10px 0 10px 0;
-    display: block;
-    text-align: center;
-    font-size: 25px;
-}
-
-#general-info-wrapper > #content > p {
-    margin-top: 5px;
-}
-
-#general-info-wrapper > #content {
-    padding: 15px 0 15px 0;
 }

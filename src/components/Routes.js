@@ -5,6 +5,7 @@ import Home from './Home';
 import SearchPageContainer from '../containers/SearchPageContainer';
 import AppPageContainer from '../containers/AppPageContainer';
 import ListPageContainer from '../containers/ListPageContainer';
+import ErrorPage from './ErrorPage';
 
 const Routes = () => {
     return (
@@ -14,6 +15,7 @@ const Routes = () => {
             <Route path='/list' component={ListPageContainer} />
             <Route path='/search/:appid' component={SearchPageContainer} />
             <Route path='/app/:appid' component={AppPageContainer} />
+            <Route component={ErrorPage}/>
         </Switch>
     </BrowserRouter>
     );

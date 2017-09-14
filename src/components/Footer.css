@@ -4,7 +4,7 @@
     flex-direction: column;
 }
 
-#search-results-wrapper, #app-info-wrapper, #new-releases-wrapper, #list-wrapper {
+#search-results-wrapper, #app-info-wrapper, #new-releases-wrapper, #list-wrapper, #error-page-wrapper {
     flex: 1;
 }
 

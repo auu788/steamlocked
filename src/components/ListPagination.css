@@ -4,16 +4,41 @@
 
 #list-data {
     list-style: none;
-    min-height: 795px;
     padding-left: 0;
     margin: 0;
 }
 
 #list-data > a > li {
-    height: 45px;
+    width: calc(100% - 15px);
+    height: 40px;
     background-color: #10315E;
     margin-bottom: 3px;
-    font-size: 25px;
+    font-size: 22px;
+    line-height: 40px;
+    position: relative;
+    padding-right: 15px;
+    border-radius: 5px;
+}
+
+#list-data > a > li > span {
+    position: absolute;
+    width: calc(100% - 120px - 5px);
+    left: 120px;
+    padding-right: 5px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+#list-data > a > li > img {
+    position: absolute;
+    height: 40px;
+    border-radius: 5px 0 0 5px;
+}
+
+#list-data > a > li:hover {
+    background-color: #132B4D;
 }
 
 #nav-controls {
@@ -27,13 +52,42 @@
 .nav-button {
     background: none;
     padding: 5px;
-    border: 1px solid white;
+    border: 1px solid rgba(255, 255, 255, 0.85);
     border-radius: 5px;
-    color: white;
+    color: rgba(255, 255, 255, 0.85);
     font-size: 20px;
+    transition: color .3s ease-out, border .3s ease-out;
+}
+
+.nav-button:active, .nav-button:focus  {
+    outline: none;
+}
+
+.nav-button:hover {
+    color: #7BBB14;
+    border: 1px solid #7BBB14;
 }
 
 .current-page {
     border: none;
     font-size: 30px;
+}
+
+#no-results {
+    display: block;
+    padding-top: 20px;
+    font-size: 25px;
+    text-align: center;
+}
+
+@media screen and (max-width: 860px) {
+    #nav-controls {
+        width: 70%;
+    }
+}
+
+@media screen and (max-width: 560px) {
+    #nav-controls {
+        width: 100%;
+    }
 }

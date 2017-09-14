@@ -1,6 +1,6 @@
 #raw-data-wrapper {
     margin-top: 30px;
-    background-color: #00173A;
+    background-color: #0B2548;
     border-radius: 5px;
     width: 100%;
     padding: 25px 0 25px 0;
@@ -33,7 +33,7 @@
 
 
 .raw-data-element:nth-child(odd) {
-    background-color: rgb(0, 29, 73);
+    background-color: #10315E;
 }
 
 .raw-data-element th {

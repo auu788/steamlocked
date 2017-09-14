@@ -240,8 +240,6 @@ class RegionLockInfoWrapper extends Component {
     }
 
     render() {
-        console.log("RENDER REGIO NLOCK INFO", this.state);
-        
         return (
             <div id="region-lock-info">
                 <div id="country-selector">
