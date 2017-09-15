@@ -3,10 +3,14 @@ import {
     getNewReleases,
     getSearchResults,
     getAppidInfo,
-    getList
+    getList,
+    getTimeUpdate
 } from './endpoints';
 
 const router = Router();
+
+router.route('/api/timeUpdate')
+    .get(getTimeUpdate);
 
 router.route('/api/newReleases')
     .get(getNewReleases);

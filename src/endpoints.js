@@ -2,12 +2,33 @@ import db from './db';
 import { escape } from 'mysql';
 import _ from 'lodash';
 
+export const getTimeUpdate = async (req, res, next) => {
+    console.log(`[REQUEST] ${req.url}`);
+	res.header("Access-Control-Allow-Origin", "*");
+	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    let sqlQuery = 'SELECT update_time FROM changenumber';
+	
+    db.query(sqlQuery, (err, results) => {
+        res.status(200).json({
+            "success": true,
+            "payload": results
+        });
+    });
+}
+
 export const getNewReleases = async (req, res, next) => {
     console.log(`[REQUEST] ${req.url}`);
 	res.header("Access-Control-Allow-Origin", "*");
 	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    let sqlQuery = 'SELECT * FROM new_releases';
-	
+    let sqlQuery = "SELECT * \
+                    FROM new_releases \
+                    WHERE appid IN \
+                        (SELECT appid \
+                        FROM apps \
+                        WHERE type='Game' AND \
+                            isfreeapp IS NULL AND \
+                            (releasestate<>'prerelease' or releasestate IS NULL))";
+    
     db.query(sqlQuery, (err, results) => {
         res.status(200).json({
             "success": true,
@@ -66,7 +87,17 @@ export const getAppidInfo = async (req, res, next) => {
 
     db.query(infoQuery, appid, (err, appResults) => {
         if (err) throw err;
-		
+        
+        if (appResults.length === 0) {
+            res.status(400).json({
+                "success": false,
+                "appid": appid,
+                "info": "No game / dlc with such appid, or game is not released."
+            });
+
+            return;
+        }
+
 		if (appResults[0].type === 'DLC') {
 			const dlcForAppid = appResults[0].dlcforappid;
 			
