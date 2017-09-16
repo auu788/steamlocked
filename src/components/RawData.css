@@ -41,3 +41,15 @@
     text-align: left;
 }
 
+@media screen and (max-width: 480px) {
+    #raw-data-table {
+        width: 100%;
+        border-left: none;
+        border-right: none;
+    }
+
+    .raw-data-element th {
+        width: 200px;
+    }
+}
+

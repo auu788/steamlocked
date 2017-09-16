@@ -3,3 +3,9 @@
     margin-top: 70px;
     width: 1040px;
 }
+
+@media screen and (max-width: 1040px) {
+    #new-releases-wrapper {
+        width: 100%;
+    }
+}

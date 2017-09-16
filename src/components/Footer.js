@@ -14,7 +14,7 @@ class Footer extends Component {
     }
 
     componentDidMount() {
-        const url = 'http://localhost:3030/api/timeUpdate';
+        const url = 'http://api.znamiec.me/api/timeUpdate';
         
         axios.get(url)
         .then((response) => {

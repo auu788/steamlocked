@@ -23,26 +23,26 @@ const AppInfo = (props) => {
                 <span id="type">{ app.type }</span>
                 <table>
                     <tbody>
-                        { app.dlcforappid && 
-                        <tr>
-                            <td className="prop-title">Base game:</td>
-                            <td><Link to={`/app/${ app.dlcforappid }`}>{ app.base_name }</Link></td>
-                        </tr> }
-                        { app.developer &&
-                        <tr>
-                            <td className="prop-title">Developer:</td>
-                            <td> { app.developer } </td>
-                        </tr> }
-                        { app.publisher &&
-                        <tr>
-                            <td className="prop-title">Publisher:</td>
-                            <td> { app.publisher } </td>
-                        </tr> }
-                        { app.release_date &&
-                        <tr>
-                            <td className="prop-title">Release date:</td>
-                            <td> { app.release_date } </td>
-                        </tr> }
+                        {app.dlcforappid && 
+                            <tr>
+                                <td className="prop-title">Base game:</td>
+                                <td><Link to={`/app/${ app.dlcforappid }`}>{ app.base_name }</Link></td>
+                            </tr>}
+                        {app.developer &&
+                            <tr>
+                                <td className="prop-title">Developer:</td>
+                                <td>{ app.developer }</td>
+                            </tr>}
+                        {app.publisher &&
+                            <tr>
+                                <td className="prop-title">Publisher:</td>
+                                <td>{ app.publisher }</td>
+                            </tr>}
+                        {app.release_date &&
+                            <tr>
+                                <td className="prop-title">Release date:</td>
+                                <td>{ app.release_date }</td>
+                            </tr>}
                         <tr>
                             <td className="prop-title">Links:</td>
                             <td><a href={`https://steamdb.info/app/${app.appid}`}>SteamDB</a> | <a href={`https://store.steampowered.com/appid/${app.appid}`}>Steam Store</a></td>

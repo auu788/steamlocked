@@ -26,6 +26,7 @@ class SearchPageContainer extends Component {
 
     componentDidMount() {
         this.props.fetchSearchResults(this.state.searchQuery);
+        this.navbarElement.focus();
         //this.getSearchResults(this.state.searchQuery);
     }
 
@@ -84,11 +85,18 @@ class SearchPageContainer extends Component {
                 <Helmet>
                     <title>Search results for '{this.state.searchQuery}' · Steam Locked</title>
                     <meta name="description" content={`Search results for '${this.state.searchQuery}'. Find out if the Steam game you want to buy has any region locks or restrictions.`} />
+                    <meta property="og:title" content={`Search results for '${this.state.searchQuery}' · Steam Locked`} />
+                    <meta property="og:description" content={`Search results for '${this.state.searchQuery}'. Find out if the Steam game you want to buy has any region locks or restrictions.`} />
+                    <meta property="og:type" content="website" />
+                    <meta property="og:site_name" content="Steam Locked" />
+                    <meta property="og:image" content={require('../images/logo.png')} />
+                    <meta name="twitter:card" content="summary_large_image" />
                 </Helmet>
                 { this.state.searchQuery.length > 0 &&
                 <Navbar
                     inputValue={ this.state.searchQuery } 
                     searchQuery={ debounceOnInputChange }
+                    navbarRef={navbar => this.navbarElement = navbar}
                 /> }
                 <SearchResults results={ this.props.searchResults.payload } />
                 <Footer />

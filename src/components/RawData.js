@@ -17,10 +17,11 @@ const RawData = (props) => {
                                 </tr>
                                 <tr>
                                     <th>Package name:</th>
-                                    {!pack.subid_name &&
-                                    <td>-</td>}
-                                    {pack.subid_name && pack.subid_name.length > 0 && 
-                                    <td>{pack.subid_name.trim()}</td>}
+                                    <td>{!pack.subid_name &&
+                                        "-"}
+                                        {pack.subid_name && pack.subid_name.length > 0 && 
+                                        `${pack.subid_name.trim()}`}
+                                    </td>
                                 </tr>
                                 <tr>
                                     <th>Billingtype:</th>
@@ -34,21 +35,20 @@ const RawData = (props) => {
                                     {pack.AllowCrossOriginTradingAndGifting && <td>Allowed</td>}
                                 </tr>
                                 {pack.PurchaseRestrictedCountries && pack.AllowPurchaseFromRestrictedCountries === 1 &&
-                                <tr>
-                                    <th>Countries allowed to activate:</th>
-                                    <td>{pack.PurchaseRestrictedCountries}</td>
-                                </tr>}
+                                    <tr>
+                                        <th>Countries allowed to activate:</th>
+                                        <td>{pack.PurchaseRestrictedCountries}</td>
+                                    </tr>}
                                 {pack.PurchaseRestrictedCountries && pack.AllowPurchaseFromRestrictedCountries === 0 &&
-                                <tr>
-                                    <th>Banned countries:</th>
-                                    <td>{pack.PurchaseRestrictedCountries}</td>
-                                </tr>}
+                                    <tr>
+                                        <th>Banned countries:</th>
+                                        <td>{pack.PurchaseRestrictedCountries}</td>
+                                    </tr>}
                                 {pack.onlyallowrunincountries && 
-                                <tr>
-                                    <th>Countries allowed to run:</th>
-                                    <td>{pack.onlyallowrunincountries}</td>
-                                </tr>
-                                }
+                                    <tr>
+                                        <th>Countries allowed to run:</th>
+                                        <td>{pack.onlyallowrunincountries}</td>
+                                    </tr>}
                             </tbody>
                         </table>
                     );

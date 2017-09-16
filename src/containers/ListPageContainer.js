@@ -52,6 +52,12 @@ class ListPageContainer extends Component {
                 <Helmet>
                     <title>List of region locked games · Steam Locked</title>
                     <meta name="description" content="Check out list of region locked games by country." />
+                    <meta property="og:title" content="List of region locked games · Steam Locked" />
+                    <meta property="og:description" content="Check out list of region locked games by country." />
+                    <meta property="og:type" content="website" />
+                    <meta property="og:site_name" content="Steam Locked" />
+                    <meta property="og:image" content={require('../images/logo.png')} />
+                    <meta name="twitter:card" content="summary_large_image" />
                 </Helmet>
                 <Navbar />
                 <List filterQuery={this.onFilterInputChange} country={this.onCountryChange} gamesList={this.prepareGamesList()}/>

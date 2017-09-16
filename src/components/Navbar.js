@@ -60,8 +60,8 @@ class NavbarWithRoute extends Component {
                         type="text" 
                         autoComplete="off" 
                         autoCorrect="off" 
-                        spellCheck="false" 
-                        autoFocus>
+                        spellCheck="false"
+                        ref={this.props.navbarRef}>
                     </input>
                     {this.state.searchQuery.length > 0 &&
                         <button id="clear-button" onClick={this.clearInput}>x</button>}

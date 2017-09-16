@@ -37,10 +37,13 @@ class List extends Component {
     }
 
     onCountryChange(selectedCountry) {
-        this.props.country(selectedCountry.value);
         this.setState({
-            shopCountryCode: selectedCountry.value
+            shopCountryCode: selectedCountry.value,
+            inputValue: ''
         });
+
+        this.props.filterQuery('');
+        this.props.country(selectedCountry.value);
     }
 
     render() {

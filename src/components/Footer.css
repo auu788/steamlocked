@@ -18,17 +18,23 @@
     #footer {
         width: calc(100% - 20px);
     }
+
+    #footer-content {
+        font-size: 12px;
+    }
+
+    #disclaimer {
+        font-size: 10px;
+    }
 }
 
 #footer {
     margin: 50px auto 0 auto;
     border-top: 2px solid rgba(255, 255, 255, 0.85);
-    height: 100%;
     padding: 10px;
 }
 
 #footer-content {
-    
     display: flex;
     flex-wrap: nowrap;
     justify-content: space-between;

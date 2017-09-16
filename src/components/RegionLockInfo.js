@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import Select from 'react-select';
 import _ from 'lodash';
 import axios from 'axios';
-import Flag from 'react-world-flags';
 
 import './RegionLockInfo.css';
 import '../utils/font-awesome/css/font-awesome.min.css'; 
@@ -55,7 +54,7 @@ const RegionLockInfoView = (props) => {
                         <span>There is a risk you won't be able to <span style={{color: "#EFBE74"}}>ACTIVATE</span> your copy from these countries</span>
                         <ul className="countries">
                             {props.data.keyLockedCountries.map((country) => {
-                                return <li key={country.code}><Flag code={country.code} height="15" className="flag" /><span>{country.name}</span></li>;
+                                return <li key={country.code}><span>{country.name}</span></li>;
                             })}
                         </ul>
                     </div>}
@@ -64,7 +63,7 @@ const RegionLockInfoView = (props) => {
                         <span>There is a risk you won't be able to <span style={{color: "#EFBE74"}}>ACTIVATE</span> and <span style={{color: "#EFBE74"}}>RUN</span> your copy from these countries</span>
                         <ul className="countries">
                             {props.data.keyRunLockedCountries.map((country) => {
-                                return <li key={country.code}><Flag code={country.code} height="15" className="flag" /><span>{country.name}</span></li>;
+                                return <li key={country.code}><span>{country.name}</span></li>;
                             })}
                         </ul>
                     </div>}
@@ -73,7 +72,7 @@ const RegionLockInfoView = (props) => {
                         <span>Some versions of the game may be <span style={{color: "#EFBE74"}}>banned</span> in your and these countries</span>
                         <ul className="countries">
                             {props.data.keyBannedCountries.map((country) => {
-                                return <li key={country.code}><Flag code={country.code} height="15" className="flag" /><span>{country.name}</span></li>;
+                                return <li key={country.code}><span>{country.name}</span></li>;
                             })}
                         </ul>
                     </div>}
@@ -105,18 +104,18 @@ class RegionLockInfoWrapper extends Component {
 
         this.onChange = this.onChange.bind(this);
 
-        // const ipPromise = this.getIPAdress();
-        // ipPromise
-        //     .then((userCountryCode) => {
-        //         this.setState({
-        //             userCountryCode
-        //         });
-        //     })
-        //     .catch(() => {
-        //         this.setState({
-        //             userCountryCode: 'US'
-        //         })
-        //     });
+        const ipPromise = this.getIPAdress();
+        ipPromise
+            .then((userCountryCode) => {
+                this.setState({
+                    userCountryCode
+                });
+            })
+            .catch(() => {
+                this.setState({
+                    userCountryCode: 'US'
+                })
+            });
     }
 
     componentWillReceiveProps(nextProps) {
@@ -171,10 +170,10 @@ class RegionLockInfoWrapper extends Component {
                         keyLocked = true;                    
                     }
 
-                    if (one.billingtype === 1 || one.billingtype === 10) {
-                        storeLockedCountries.push(...one.PurchaseRestrictedCountries.split(' '));
-                        storeLocked = true;
-                    }
+                    // if (one.billingtype === 1 || one.billingtype === 10) {
+                    //     storeLockedCountries.push(...one.PurchaseRestrictedCountries.split(' '));
+                    //     storeLocked = true;
+                    // }
                 }
 
                 if (_.includes(one.PurchaseRestrictedCountries, userCountryCode)
@@ -188,10 +187,10 @@ class RegionLockInfoWrapper extends Component {
                         keyLocked = true;                       
                     }
 
-                    if (one.billingtype === 1 || one.billingtype === 10) {
-                        storeBannedCountries.push(...one.PurchaseRestrictedCountries.split(' '));
-                        storeLocked = true;
-                    }
+                    // if (one.billingtype === 1 || one.billingtype === 10) {
+                    //     storeBannedCountries.push(...one.PurchaseRestrictedCountries.split(' '));
+                    //     storeLocked = true;
+                    // }
                 }
             }
 
@@ -206,10 +205,10 @@ class RegionLockInfoWrapper extends Component {
                         keyLocked = true;                       
                     }
 
-                    if (one.billingtype === 1 || one.billingtype === 10) {
-                        storeRunLockedCountries.push(...one.onlyallowrunincountries.split(' '));
-                        storeLocked = true;
-                    }
+                    // if (one.billingtype === 1 || one.billingtype === 10) {
+                    //     storeRunLockedCountries.push(...one.onlyallowrunincountries.split(' '));
+                    //     storeLocked = true;
+                    // }
                 }
             }
         });
@@ -218,7 +217,7 @@ class RegionLockInfoWrapper extends Component {
         //     return COUNTRIES_NAMES_OBJECT[country];
         // });
 
-        console.log("REGION LOCK LOCKED", storeLocked, keyLocked);
+        // console.log("REGION LOCK LOCKED", storeLocked, keyLocked);
         this.setState({
             regionLocked,
             storeLocked,

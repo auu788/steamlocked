@@ -14,7 +14,7 @@ class NewReleases extends Component {
     }
 
     componentDidMount() {
-        const url = 'http://localhost:3030/api/newReleases';
+        const url = 'http://api.znamiec.me/api/newReleases';
 
         axios.get(url)
         .then((response) => {
