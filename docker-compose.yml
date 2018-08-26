@@ -1,0 +1,18 @@
+version: '3'
+services:
+  redis:
+    image: redis:latest
+    ports:
+      - 6379:6379
+  apps-updater:
+    build: ./apps-updater
+    depends_on:
+      - redis
+  packages-updater:
+    build: ./packages-updater
+    depends_on:
+      - redis
+  queue-updater:
+    build: ./queue-updater
+    depends_on:
+      - redis

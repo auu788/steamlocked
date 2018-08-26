@@ -1,0 +1,10 @@
+FROM python:slim
+
+COPY . /app
+WORKDIR /app
+
+RUN pip install steam
+# RUN pip install psycopg2-binary
+RUN pip install redis
+
+CMD ["python", "-u", "./packages-updater.py"]
