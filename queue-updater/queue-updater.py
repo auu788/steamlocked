@@ -25,17 +25,20 @@ def updateQueue():
     if r.get('current_change') != None:
         res = client.get_changes_since(int(r.get('current_change')), True, True)
     else:
-        res = client.get_changes_since(4994654, True, True)
+        res = client.get_changes_since(5027651, True, True)
 
+    redis_pipe = r.pipeline()
     for package_change in res.package_changes:
-        r.rpush('packages-queue', package_change.packageid)
+        redis_pipe.rpush('packages-queue', package_change.packageid)
         print ('PACKAGE {} - {}'.format(package_change.packageid, package_change.change_number))
 
     for app_change in res.app_changes:
-        r.rpush('apps-queue', app_change.appid)
+        redis_pipe.rpush('apps-queue', app_change.appid)
         print ('APP {} - {}'.format(app_change.appid, app_change.change_number))
 
-    r.set('current_change', res.current_change_number)
+    redis_pipe.set('current_change', res.current_change_number)
+    redis_pipe.execute()
+
     client.logout()
 
 schedule.every().minute.do(updateQueue)
