@@ -51,7 +51,7 @@ def str2bool(v):
     
     return False
 
-while True:
+while False:
     pipe = r.pipeline()
 
     pipe.get('current_change')
