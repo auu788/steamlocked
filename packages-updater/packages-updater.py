@@ -11,16 +11,30 @@ r = redis.StrictRedis(host='redis', port=6379, db=0, charset="utf-8", decode_res
 
 def handle_package(package):
     print('Package: {}'.format(package))
-    sub_id = package.get('packageid')
-    billingtype = package.get('billingtype')
-    allowcrossregiontradingandgifting = str2bool(package.get('extended', {}).get('allowcrossregiontradingandgifting'))
-    allowpurchasefromrestrictedcountries = str2bool(package.get('extended', {}).get('allowpurchasefromrestrictedcountries'))
-    purchaserestrictedcountries = package.get('extended', {}).get('purchaserestrictedcountries')
-    onlyallowrunincountries = package.get('extended', {}).get('onlyallowrunincountries')
+    package_id = package.get('packageid')
+    billing_type = package.get('billingtype')
+    allow_cross_region_trading_and_gifting = str2bool(package.get('extended', {}).get('allowcrossregiontradingandgifting'))
+    allow_purchase_from_restricted_countries = str2bool(package.get('extended', {}).get('allowpurchasefromrestrictedcountries'))
+    purchase_restricted_countries = package.get('extended', {}).get('purchaserestrictedcountries')
+    only_allow_run_in_countries = package.get('extended', {}).get('onlyallowrunincountries')
+    
+    package_json = {
+        "package_id": package_id,
+        "billing_type": billing_type,
+        "allow_cross_region_trading_and_gifting": allow_cross_region_trading_and_gifting,
+        "allow_purchase_from_restricted_countries": allow_purchase_from_restricted_countries,
+        "purchase_restricted_countries": purchase_restricted_countries,
+        "only_allow_run_in_countries": only_allow_run_in_countries,
+    }
 
-    for appid in package.get('appids', {}).values():
-        print('Appid: {}'.format(appid))
-        r.rpush('apps-queue', appid)
+    for app_id in package.get('appids', {}).values():
+        print('Appid: {}'.format(app_id))
+        app = {
+            "app_id": app_id,
+            "package": package_json
+        }
+
+        r.rpush('apps-queue', app)
 
 def connect_to_steam():
     client = SteamClient()

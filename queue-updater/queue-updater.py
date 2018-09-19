@@ -33,7 +33,11 @@ def updateQueue():
         print ('PACKAGE {} - {}'.format(package_change.packageid, package_change.change_number))
 
     for app_change in res.app_changes:
-        redis_pipe.rpush('apps-queue', app_change.appid)
+        app_json = {
+            'app_id': app_change.appid,
+            'package': None
+        }
+        redis_pipe.rpush('apps-queue', app_json)
         print ('APP {} - {}'.format(app_change.appid, app_change.change_number))
 
     redis_pipe.set('current_change', res.current_change_number)
