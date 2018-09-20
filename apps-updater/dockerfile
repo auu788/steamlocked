@@ -5,5 +5,6 @@ WORKDIR /app
 
 RUN pip install steam
 RUN pip install redis
+RUN pip install pymysql
 
 CMD ["python", "-u", "./apps-updater.py"]

@@ -2,8 +2,8 @@
 import gevent.monkey
 gevent.monkey.patch_all()
 
-import redis
 import time
+import redis
 from steam import SteamClient
 from steam.enums import EResult
 
@@ -65,7 +65,7 @@ def str2bool(v):
     
     return False
 
-while False:
+while True:
     pipe = r.pipeline()
 
     pipe.get('current_change')
@@ -80,7 +80,7 @@ while False:
         time.sleep(5)
         continue
 
-    print (package_ids)
+    print(package_ids)
     client = connect_to_steam()
     while True:
         try:
@@ -92,9 +92,8 @@ while False:
             
             break
         except AttributeError:
-            print ('Didn\'t get any products, retrying in 5 seconds...')
+            print('Didn\'t get any products, retrying in 5 seconds...')
             time.sleep(5)
-            pass
         
     update_changenumber(changenumber)
     time.sleep(10)

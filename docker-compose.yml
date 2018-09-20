@@ -4,15 +4,30 @@ services:
     image: redis:latest
     ports:
       - 6379:6379
+  mariadb:
+    image: mariadb:latest
+    restart: on-failure    
+    ports:
+      - 3306:3306
+    volumes:
+      - ./mariadb:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootPWD
+      MYSQL_DATABASE: test-db
+      MYSQL_USER: test-user
+      MYSQL_PASSWORD: userPWD
   apps-updater:
     build: ./apps-updater
     depends_on:
       - redis
+      - mariadb
   packages-updater:
     build: ./packages-updater
     depends_on:
       - redis
+      - mariadb
   queue-updater:
     build: ./queue-updater
     depends_on:
       - redis
+      - mariadb

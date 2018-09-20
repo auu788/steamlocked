@@ -2,76 +2,91 @@
 import gevent.monkey
 gevent.monkey.patch_all()
 
-import redis
+import ast
 import time
+import redis
 import requests
-import json
-import mysql.connector as db
+import pymysql.cursors
 from steam import SteamClient
 from steam.enums import EResult
-import pymysql.cursors
 
-r = redis.StrictRedis(host='redis', port=6379, db=0, charset="utf-8", decode_responses=True)
+r = redis.StrictRedis(
+    host='redis',
+    port=6379,
+    db=0,
+    charset="utf-8",
+    decode_responses=True)
 
 def list_of_jsons_to_json(dict_list):
     result = {}
 
     for item in dict_list:
-        if (item["package"]):
-            if result.get(item["appid"]):
-                result.get(item["appid"]).append(item["package"])
+        item = ast.literal_eval(item)
+
+        if item["package"]:
+            if result.get(item["app_id"]):
+                result.get(item["app_id"]).append(item["package"])
             else:
-                result[item["appid"]] = [item["package"]]
+                result[item["app_id"]] = [item["package"]]
+        else:
+            result[item["app_id"]] = []
 
     return result
 
 def get_release_date(appid):
-    response = requests.get('https://store.steampowered.com/api/appdetails/?filters=release_date&appids=' + str(appid)).json()
-    if response.get(str(appid), {}).get('success') == True:
+    STEAM_API_URL = 'https://store.steampowered.com/api/appdetails/?filters=release_date&appids=' + str(appid)
+
+    response = requests.get(STEAM_API_URL).json()
+    if response.get(str(appid), {}).get('success'):
         return response.get(str(appid), {}).get('data', {}).get('release_date', {}).get('date')
     
     return None
 
 def handle_db_connection():
-    conn = pymysql.connect(host='localhost',
-                            user='user',
-                            password='passwd',
-                            db='db',
-                            charset='utf8mb4',
-                            cursorclass=pymysql.cursors.DictCursor)
+    conn = pymysql.connect(
+        host='mariadb',
+        user='test-user',
+        password='userPWD',
+        db='test-db',
+        charset='utf8mb4',
+        cursorclass=pymysql.cursors.DictCursor)
                             
     return conn
 
 def update_db_with_app(app):
-    conn = handle_db_connection()
+    print('App: {}'.format(app))
 
-    try:
-        with conn.cursor() as cursor:
-            sql = "INSERT INTO `users` \
-                (`email`, `password`) \
-                VALUES (%s, %s)"
+    # conn = handle_db_connection()
+
+    # try:
+    #     with conn.cursor() as cursor:
+    #         sql = "INSERT INTO `users` \
+    #             (`email`, `password`) \
+    #             VALUES (%s, %s)"
             
-            cursor.execute(sql, ('email', 'secret'))
-        conn.commit()
-    finally:
-        conn.close()
+    #         cursor.execute(sql, ('email', 'secret'))
+    #     conn.commit()
+    # finally:
+    #     conn.close()
 
 def update_db_with_package(package, app_id):
-    conn = handle_db_connection()
 
-    try:
-        with conn.cursor() as cursor:
-            sql = "INSERT INTO `users` \
-                (`email`, `password`) \
-                VALUES (%s, %s)"
+    print('Appid: {} - {}'.format(app_id, package))
+    # conn = handle_db_connection()
+
+    # try:
+    #     with conn.cursor() as cursor:
+    #         sql = "INSERT INTO `users` \
+    #             (`email`, `password`) \
+    #             VALUES (%s, %s)"
             
-            cursor.execute(sql, ('email', 'secret'))
-        conn.commit()
-    finally:
-        conn.close()
+    #         cursor.execute(sql, ('email', 'secret'))
+    #     conn.commit()
+    # finally:
+    #     conn.close()
 
 def handle_app(app, app_to_packages):
-    app_id = app.get('appid')
+    app_id = int(app.get('appid'))
     release_state = app.get('common', {}).get('releasestate')
     app_type = app.get('common', {}).get('type', '').lower()
     release_date = get_release_date(app_id)
@@ -116,7 +131,7 @@ def is_valid_app(app):
     apptype = app.get('common', {}).get('type', '').lower()
 
     if (apptype != 'game' and apptype != 'dlc') or releasestate == 'prerelease':
-        print ('[{}] releasestate: {}, apptype: {}'.format(app.get('appid'), releasestate, apptype))
+        print('[{}] releasestate: {}, apptype: {}'.format(app.get('appid'), releasestate, apptype))
         return False
     
     return True
@@ -140,15 +155,16 @@ while True:
     pipe_response = pipe.execute()
 
     changenumber = pipe_response[0]
-    apps = [json.loads(app) for app in pipe_response[1]]
+    apps = [app for app in pipe_response[1]]
+    print(apps)
     app_to_packages = list_of_jsons_to_json(apps)
-    app_ids = [int(app_id) for app_id in apps]
-
+    app_ids = app_to_packages.keys()
+    print(app_ids)
     if not app_ids:
         time.sleep(5)
         continue
 
-    print (app_ids)
+    print(app_ids)
     client = connect_to_steam()
     while True:
         try:
@@ -160,9 +176,8 @@ while True:
             
             break
         except AttributeError:
-            print ('Didn\'t get any apps, retrying in 5 seconds...')
+            print('Didn\'t get any apps, retrying in 5 seconds...')
             time.sleep(5)
-            pass
         
     update_changenumber(changenumber)
     time.sleep(30)
