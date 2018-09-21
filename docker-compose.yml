@@ -11,23 +11,30 @@ services:
       - 3306:3306
     volumes:
       - ./mariadb:/var/lib/mysql
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --skip-character-set-client-handshake
     environment:
       MYSQL_ROOT_PASSWORD: rootPWD
-      MYSQL_DATABASE: test-db
       MYSQL_USER: test-user
       MYSQL_PASSWORD: userPWD
+  db-setup:
+    build: ./db-setup
+    depends_on:
+      - mariadb
   apps-updater:
     build: ./apps-updater
     depends_on:
       - redis
-      - mariadb
+      - db-setup
   packages-updater:
     build: ./packages-updater
     depends_on:
       - redis
-      - mariadb
+      - db-setup
   queue-updater:
     build: ./queue-updater
     depends_on:
       - redis
-      - mariadb
+      - db-setup

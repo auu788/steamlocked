@@ -7,6 +7,7 @@ import time
 import redis
 import requests
 import pymysql.cursors
+from datetime import datetime
 from steam import SteamClient
 from steam.enums import EResult
 
@@ -56,34 +57,92 @@ def handle_db_connection():
 def update_db_with_app(app):
     print('App: {}'.format(app))
 
-    # conn = handle_db_connection()
+    conn = handle_db_connection()
+    updated_at = datetime.utcnow()
 
-    # try:
-    #     with conn.cursor() as cursor:
-    #         sql = "INSERT INTO `users` \
-    #             (`email`, `password`) \
-    #             VALUES (%s, %s)"
-            
-    #         cursor.execute(sql, ('email', 'secret'))
-    #     conn.commit()
-    # finally:
-    #     conn.close()
+    try:
+        with conn.cursor() as cursor:
+            sql = "INSERT INTO `apps` \
+                VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
+                ON DUPLICATE KEY UPDATE \
+                    appid=%s, \
+                    name=%s, \
+                    type=%s, \
+                    developer=%s, \
+                    publisher=%s, \
+                    release_date=%s, \
+                    dlcforappid=%s, \
+                    isfreeapp=%s, \
+                    section_type=%s, \
+                    releasestate=%s, \
+                    updated_at=%s"
+
+            cursor.execute(sql, (
+                app['app_id'], 
+                app['name'],
+                app['app_type'],
+                app['developer'], 
+                app['publisher'], 
+                app['release_date'], 
+                app['dlc_app_id'],
+                app['is_free_app'], 
+                app['section_type'], 
+                app['release_state'],
+                updated_at,
+                app['app_id'], 
+                app['name'],
+                app['app_type'],
+                app['developer'], 
+                app['publisher'], 
+                app['release_date'], 
+                app['dlc_app_id'],
+                app['is_free_app'], 
+                app['section_type'], 
+                app['release_state'],
+                updated_at))
+        conn.commit()
+    finally:
+        conn.close()
 
 def update_db_with_package(package, app_id):
+    print('Package: {} - {}'.format(app_id, package))
+    conn = handle_db_connection()
+    updated_at = datetime.utcnow()
 
-    print('Appid: {} - {}'.format(app_id, package))
-    # conn = handle_db_connection()
+    try:
+        with conn.cursor() as cursor:
+            sql = "INSERT INTO `packages` \
+                VALUES(%s, %s, %s, %s, %s, %s, %s, %s) \
+                ON DUPLICATE KEY UPDATE \
+                    appid=%s, \
+                    subid=%s, \
+                    billingtype=%s, \
+                    AllowPurchaseFromRestrictedCountries=%s, \
+                    PurchaseRestrictedCountries=%s, \
+                    AllowCrossRegionTradingAndGifting=%s, \
+                    onlyallowrunincountries=%s, \
+                    updated_at=%s"
 
-    # try:
-    #     with conn.cursor() as cursor:
-    #         sql = "INSERT INTO `users` \
-    #             (`email`, `password`) \
-    #             VALUES (%s, %s)"
-            
-    #         cursor.execute(sql, ('email', 'secret'))
-    #     conn.commit()
-    # finally:
-    #     conn.close()
+            cursor.execute(sql, (
+                app_id, 
+                package['package_id'], 
+                package['billing_type'], 
+                package['allow_cross_region_trading_and_gifting'], 
+                package['allow_purchase_from_restricted_countries'], 
+                package['purchase_restricted_countries'], 
+                package['only_allow_run_in_countries'], 
+                updated_at,
+                app_id, 
+                package['package_id'], 
+                package['billing_type'], 
+                package['allow_cross_region_trading_and_gifting'], 
+                package['allow_purchase_from_restricted_countries'], 
+                package['purchase_restricted_countries'], 
+                package['only_allow_run_in_countries'], 
+                updated_at))
+        conn.commit()
+    finally:
+        conn.close()
 
 def handle_app(app, app_to_packages):
     app_id = int(app.get('appid'))
@@ -156,15 +215,14 @@ while True:
 
     changenumber = pipe_response[0]
     apps = [app for app in pipe_response[1]]
-    print(apps)
     app_to_packages = list_of_jsons_to_json(apps)
     app_ids = app_to_packages.keys()
-    print(app_ids)
+
     if not app_ids:
         time.sleep(5)
         continue
 
-    print(app_ids)
+    # print(app_ids)
     client = connect_to_steam()
     while True:
         try:

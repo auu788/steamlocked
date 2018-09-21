@@ -80,7 +80,7 @@ while True:
         time.sleep(5)
         continue
 
-    print(package_ids)
+    # print(package_ids)
     client = connect_to_steam()
     while True:
         try:

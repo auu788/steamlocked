@@ -1,0 +1,9 @@
+FROM python:slim
+
+COPY . /app
+WORKDIR /app
+
+RUN python -m pip install gevent
+RUN pip install pymysql
+
+CMD ["python", "-u", "./db-setup.py"]
