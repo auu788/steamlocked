@@ -2,11 +2,13 @@
 import gevent.monkey
 gevent.monkey.patch_all()
 
+import time
 import pymysql.cursors
 
+time.sleep(5)
 conn = pymysql.connect(
     host='mariadb',
-    user='test-user',
+    user='user-test',
     password='userPWD',
     charset='utf8mb4',
     cursorclass=pymysql.cursors.DictCursor)
@@ -21,8 +23,6 @@ try:
         cursor.execute(database_creation)
 
         cursor.execute('USE `test-db`')    
-        cursor.execute('DROP TABLE IF EXISTS `apps`')
-        cursor.execute('DROP TABLE IF EXISTS `packages`')
         
         apps_table = "CREATE TABLE IF NOT EXISTS `apps` ( \
             appid INTEGER NOT NULL, \
