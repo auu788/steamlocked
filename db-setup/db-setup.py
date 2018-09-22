@@ -8,8 +8,8 @@ import pymysql.cursors
 time.sleep(5)
 conn = pymysql.connect(
     host='mariadb',
-    user='user-test',
-    password='userPWD',
+    user='root',
+    password='rootPWD',
     charset='utf8mb4',
     cursorclass=pymysql.cursors.DictCursor)
 
