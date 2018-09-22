@@ -23,22 +23,24 @@ def update_queue():
     res = None
 
     if r.get('current_change') != None:
-        res = client.get_changes_since(int(r.get('current_change')), True, True)
+        res = client.get_changes_since(int(r.get('current_change')), False, True)
     else:
-        res = client.get_changes_since(5027651, True, True)
+        res = client.get_changes_since(5105280, False, True)
+    
+    print('Fetched {} package changes'.format(len(res.package_changes)))
 
     redis_pipe = r.pipeline()
     for package_change in res.package_changes:
         redis_pipe.rpush('packages-queue', package_change.packageid)
         print('PACKAGE {} - {}'.format(package_change.packageid, package_change.change_number))
 
-    for app_change in res.app_changes:
-        app_json = {
-            "app_id": app_change.appid,
-            "package": {}
-        }
-        redis_pipe.rpush('apps-queue', app_json)
-        print('APP {} - {}'.format(app_change.appid, app_change.change_number))
+    # for app_change in res.app_changes:
+    #     app_json = {
+    #         "app_id": app_change.appid,
+    #         "package": {}
+    #     }
+    #     redis_pipe.rpush('apps-queue', app_json)
+    #     print('APP {} - {}'.format(app_change.appid, app_change.change_number))
 
     redis_pipe.set('current_change', res.current_change_number)
     redis_pipe.execute()

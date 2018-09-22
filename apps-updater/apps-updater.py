@@ -222,11 +222,12 @@ while True:
     app_to_packages = list_of_jsons_to_json(apps)
     app_ids = app_to_packages.keys()
 
+    print('Fetched {} apps from queue...'.format(len(app_ids)))
+
     if not app_ids:
         time.sleep(5)
         continue
 
-    # print(app_ids)
     client = connect_to_steam()
     while True:
         try:
@@ -242,4 +243,5 @@ while True:
             time.sleep(5)
         
     update_changenumber(changenumber)
-    time.sleep(30)
+    print('Batch completed, retry in 10 seconds...')
+    time.sleep(10)

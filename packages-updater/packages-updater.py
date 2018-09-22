@@ -79,6 +79,8 @@ while True:
     changenumber = pipe_response[0]
     package_ids = [int(num) for num in pipe_response[1]]
 
+    print('Fetched {} packages from queue...'.format(len(package_ids)))
+
     if not package_ids:
         time.sleep(5)
         continue
@@ -99,4 +101,5 @@ while True:
             time.sleep(5)
         
     update_changenumber(changenumber)
+    print('Batch completed, retry in 10 seconds...')
     time.sleep(10)
