@@ -126,18 +126,18 @@ def update_db_with_package(package, app_id):
             cursor.execute(sql, (
                 app_id, 
                 package['package_id'], 
-                package['billing_type'], 
-                package['allow_cross_region_trading_and_gifting'], 
+                package['billing_type'],
                 package['allow_purchase_from_restricted_countries'], 
                 package['purchase_restricted_countries'], 
+                package['allow_cross_region_trading_and_gifting'], 
                 package['only_allow_run_in_countries'], 
                 updated_at,
                 app_id, 
                 package['package_id'], 
-                package['billing_type'], 
-                package['allow_cross_region_trading_and_gifting'], 
+                package['billing_type'],
                 package['allow_purchase_from_restricted_countries'], 
                 package['purchase_restricted_countries'], 
+                package['allow_cross_region_trading_and_gifting'], 
                 package['only_allow_run_in_countries'], 
                 updated_at))
         conn.commit()
