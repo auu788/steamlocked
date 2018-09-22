@@ -19,18 +19,18 @@ services:
     build: ./db-setup
     depends_on:
       - mariadb
-  # apps-updater:
-  #   build: ./apps-updater
-  #   depends_on:
-  #     - redis
-  #     - db-setup
-  # packages-updater:
-  #   build: ./packages-updater
-  #   depends_on:
-  #     - redis
-  #     - db-setup
-  # queue-updater:
-  #   build: ./queue-updater
-  #   depends_on:
-  #     - redis
-  #     - db-setup
+  apps-updater:
+    build: ./apps-updater
+    depends_on:
+      - redis
+      - db-setup
+  packages-updater:
+    build: ./packages-updater
+    depends_on:
+      - redis
+      - db-setup
+  queue-updater:
+    build: ./queue-updater
+    depends_on:
+      - redis
+      - db-setup

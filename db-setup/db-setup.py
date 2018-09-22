@@ -63,5 +63,6 @@ try:
         cursor.execute(new_releases_table)
         cursor.execute(changenumber_table)
     conn.commit()
+    print("DB operations done successfully")
 finally:
     conn.close()
