@@ -5,24 +5,24 @@ gevent.monkey.patch_all()
 import time
 import pymysql.cursors
 
-time.sleep(5)
+print("DB preparations will start in 10 seconds...")
+time.sleep(10)
+print("DB preparations started")
 conn = pymysql.connect(
     host='mariadb',
-    user='root',
-    password='rootPWD',
+    user='test-user',
+    password='userPWD',
+    db='test-db',
     charset='utf8mb4',
     cursorclass=pymysql.cursors.DictCursor)
 
 try:
     with conn.cursor() as cursor:
-        cursor.execute('DROP DATABASE IF EXISTS `test-db`')
+        database_collation = "ALTER DATABASE `test-db` \
+            CHARACTER SET `utf8mb4` \
+            COLLATE `utf8mb4_unicode_ci`"
 
-        database_creation = "CREATE DATABASE IF NOT EXISTS `test-db` \
-            COLLATE=`utf8mb4_unicode_ci`"
-
-        cursor.execute(database_creation)
-
-        cursor.execute('USE `test-db`')    
+        cursor.execute(database_collation)
         
         apps_table = "CREATE TABLE IF NOT EXISTS `apps` ( \
             appid INTEGER NOT NULL, \
@@ -63,6 +63,6 @@ try:
         cursor.execute(new_releases_table)
         cursor.execute(changenumber_table)
     conn.commit()
-    print("DB operations done successfully")
+    print("DB preparation done successfully")
 finally:
     conn.close()

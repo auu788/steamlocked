@@ -45,6 +45,10 @@ def update_queue():
 
     client.logout()
 
+print('queue-updater will start in 15 seconds...')
+time.sleep(15)
+print('queue-updater started')
+
 schedule.every().minute.do(update_queue)
 
 while 1:

@@ -15,6 +15,7 @@ services:
       MYSQL_ROOT_PASSWORD: rootPWD
       MYSQL_USER: test-user
       MYSQL_PASSWORD: userPWD
+      MYSQL_DATABASE: test-db
   db-setup:
     build: ./db-setup
     depends_on:

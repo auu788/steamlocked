@@ -65,6 +65,9 @@ def str2bool(v):
     
     return False
 
+print('packages-updater will start in 15 seconds...')
+time.sleep(15)
+print('packages-updater started')
 while True:
     pipe = r.pipeline()
 
