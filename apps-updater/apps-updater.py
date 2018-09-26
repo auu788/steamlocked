@@ -2,21 +2,25 @@
 import gevent.monkey
 gevent.monkey.patch_all()
 
+import os
 import ast
 import time
 import redis
 import requests
+import sentry_sdk
 import pymysql.cursors
 from datetime import datetime
 from steam import SteamClient
 from steam.enums import EResult
 
-r = redis.StrictRedis(
-    host='redis',
-    port=6379,
-    db=0,
-    charset="utf-8",
-    decode_responses=True)
+MYSQL_HOST = "mariadb"
+MYSQL_DATABASE = os.environ['MYSQL_DATABASE']
+MYSQL_USER = os.environ['MYSQL_USER']
+MYSQL_PASSWORD = os.environ['MYSQL_PASSWORD']
+
+SENTRY_KEY = os.environ['SENTRY_KEY']
+SENTRY_PROJECT = os.environ['SENTRY_PROJECT']
+SENTRY_URL = "https://{}@sentry.io/{}".format(SENTRY_KEY, SENTRY_PROJECT)
 
 def list_of_jsons_to_json(dict_list):
     result = {}
@@ -45,10 +49,10 @@ def get_release_date(appid):
 
 def handle_db_connection():
     conn = pymysql.connect(
-        host='mariadb',
-        user='test-user',
-        password='userPWD',
-        db='test-db',
+        host=MYSQL_HOST,
+        user=MYSQL_USER,
+        password=MYSQL_PASSWORD,
+        db=MYSQL_DATABASE,
         charset='utf8mb4',
         cursorclass=pymysql.cursors.DictCursor)
                             
@@ -204,44 +208,64 @@ def str2bool(v):
     
     return False
 
-print('apps-updater will start in 15 seconds...')
-time.sleep(15)
-print('apps-updater started')
-
-while True:
-    pipe = r.pipeline()
-
-    pipe.get('current_change')
-    pipe.lrange('apps-queue', 0, 49)
-    pipe.ltrim('apps-queue', 50, -1)
-
-    pipe_response = pipe.execute()
-
-    changenumber = pipe_response[0]
-    apps = [app for app in pipe_response[1]]
-    app_to_packages = list_of_jsons_to_json(apps)
-    app_ids = app_to_packages.keys()
-
-    print('Fetched {} apps from queue...'.format(len(app_ids)))
-
-    if not app_ids:
-        time.sleep(5)
-        continue
-
-    client = connect_to_steam()
+def run_apps_updater():
     while True:
-        try:
-            data = client.get_product_info(apps=app_ids)
+        pipe = r.pipeline()
 
-            for app in data.get('apps', {}).values():
-                if is_valid_app(app):
-                    handle_app(app, app_to_packages)
-            
-            break
-        except AttributeError:
-            print('Didn\'t get any apps, retrying in 5 seconds...')
+        pipe.get('current_change')
+        pipe.lrange('apps-queue', 0, 49)
+        pipe.ltrim('apps-queue', 50, -1)
+
+        pipe_response = pipe.execute()
+
+        changenumber = pipe_response[0]
+        apps = [app for app in pipe_response[1]]
+        app_to_packages = list_of_jsons_to_json(apps)
+        app_ids = app_to_packages.keys()
+
+        print('Fetched {} apps from queue...'.format(len(app_ids)))
+
+        if not app_ids:
             time.sleep(5)
-        
-    update_changenumber(changenumber)
-    print('Batch completed, retry in 10 seconds...')
-    time.sleep(10)
+            continue
+
+        client = connect_to_steam()
+        while True:
+            try:
+                data = client.get_product_info(apps=app_ids)
+
+                for app in data.get('apps', {}).values():
+                    if is_valid_app(app):
+                        handle_app(app, app_to_packages)
+                
+                break
+            except AttributeError:
+                print('Didn\'t get any apps, retrying in 5 seconds...')
+                time.sleep(5)
+            
+        update_changenumber(changenumber)
+        print('Batch completed, retry in 10 seconds...')
+        time.sleep(10)
+
+if __name__ == "__main__":
+    print('apps-updater will start in 15 seconds...')
+    time.sleep(15)
+    print('apps-updater is starting...')
+
+    sentry_sdk.init(
+        SENTRY_URL,
+        server_name = 'apps-updater'
+    )
+
+    try:
+        r = redis.StrictRedis(
+            host='redis',
+            port=6379,
+            db=0,
+            charset="utf-8",
+            decode_responses=True)
+    
+        run_apps_updater()
+
+    except Exception as e:
+        sentry_sdk.capture_exception(e)
