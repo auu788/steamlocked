@@ -2,14 +2,23 @@
 import gevent.monkey
 gevent.monkey.patch_all()
 
+import os
 import time
 import redis
+import sentry_sdk
 from steam import SteamClient
 from steam.enums import EResult
 
-r = redis.StrictRedis(host='redis', port=6379, db=0, charset="utf-8", decode_responses=True)
+MYSQL_HOST = "mariadb"
+MYSQL_DATABASE = os.environ['MYSQL_DATABASE']
+MYSQL_USER = os.environ['MYSQL_USER']
+MYSQL_PASSWORD = os.environ['MYSQL_PASSWORD']
 
-def handle_package(package):
+SENTRY_KEY = os.environ['SENTRY_KEY']
+SENTRY_PROJECT = os.environ['SENTRY_PROJECT']
+SENTRY_URL = "https://{}@sentry.io/{}".format(SENTRY_KEY, SENTRY_PROJECT)
+
+def handle_package(package, redis):
     print('Package: {}'.format(package))
     package_id = package.get('packageid')
     billing_type = package.get('billingtype')
@@ -34,7 +43,7 @@ def handle_package(package):
             "package": package_json
         }
 
-        r.rpush('apps-queue', app)
+        redis.rpush('apps-queue', app)
 
 def connect_to_steam():
     client = SteamClient()
@@ -65,41 +74,63 @@ def str2bool(v):
     
     return False
 
-print('packages-updater will start in 15 seconds...')
-time.sleep(15)
-print('packages-updater started')
-while True:
-    pipe = r.pipeline()
-
-    pipe.get('current_change')
-    pipe.lrange('packages-queue', 0, 99)
-    pipe.ltrim('packages-queue', 100, -1)
-
-    pipe_response = pipe.execute()
-    changenumber = pipe_response[0]
-    package_ids = [int(num) for num in pipe_response[1]]
-
-    print('Fetched {} packages from queue...'.format(len(package_ids)))
-
-    if not package_ids:
-        time.sleep(5)
-        continue
-
-    # print(package_ids)
-    client = connect_to_steam()
+def run_packages_updater(redis):
     while True:
-        try:
-            data = client.get_product_info(packages=package_ids)
+        pipe = redis.pipeline()
 
-            for package in data.get('packages', {}).values():
-                if is_valid_package(package):
-                    handle_package(package)
-            
-            break
-        except AttributeError:
-            print('Didn\'t get any products, retrying in 5 seconds...')
+        pipe.get('current_change')
+        pipe.lrange('packages-queue', 0, 99)
+        pipe.ltrim('packages-queue', 100, -1)
+
+        pipe_response = pipe.execute()
+        changenumber = pipe_response[0]
+        package_ids = [int(num) for num in pipe_response[1]]
+
+        print('Fetched {} packages from queue...'.format(len(package_ids)))
+
+        if not package_ids:
             time.sleep(5)
-        
-    update_changenumber(changenumber)
-    print('Batch completed, retry in 10 seconds...')
-    time.sleep(10)
+            continue
+
+        # print(package_ids)
+        client = connect_to_steam()
+        while True:
+            try:
+                data = client.get_product_info(packages=package_ids)
+
+                for package in data.get('packages', {}).values():
+                    if is_valid_package(package):
+                        handle_package(package, redis)
+                
+                break
+            except AttributeError:
+                print('Didn\'t get any products, retrying in 5 seconds...')
+                time.sleep(5)
+            
+        update_changenumber(changenumber)
+        print('Batch completed, retry in 10 seconds...')
+        time.sleep(10)
+
+if __name__ == "__main__":
+    print('packages-updater will start in 15 seconds...')
+    time.sleep(15)
+    print('packages-updater is starting...')
+
+    sentry_sdk.init(
+        SENTRY_URL,
+        server_name = 'packages-updater'
+    )
+
+    try:
+        r = redis.StrictRedis(
+            host='redis',
+            port=6379,
+            db=0,
+            charset="utf-8",
+            decode_responses=True)
+    
+        run_packages_updater(r)
+
+    except Exception as e:
+        sentry_sdk.capture_exception(e)
+

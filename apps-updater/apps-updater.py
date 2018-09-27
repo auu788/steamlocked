@@ -208,9 +208,9 @@ def str2bool(v):
     
     return False
 
-def run_apps_updater():
+def run_apps_updater(redis):
     while True:
-        pipe = r.pipeline()
+        pipe = redis.pipeline()
 
         pipe.get('current_change')
         pipe.lrange('apps-queue', 0, 49)
@@ -265,7 +265,7 @@ if __name__ == "__main__":
             charset="utf-8",
             decode_responses=True)
     
-        run_apps_updater()
+        run_apps_updater(r)
 
     except Exception as e:
         sentry_sdk.capture_exception(e)

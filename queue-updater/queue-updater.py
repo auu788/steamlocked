@@ -2,14 +2,25 @@
 import gevent.monkey
 gevent.monkey.patch_all()
 
+import os
 import time
 import redis
 import schedule
+import sentry_sdk
 from steam import SteamClient
 from steam.enums import EResult
 
+MYSQL_HOST = "mariadb"
+MYSQL_DATABASE = os.environ['MYSQL_DATABASE']
+MYSQL_USER = os.environ['MYSQL_USER']
+MYSQL_PASSWORD = os.environ['MYSQL_PASSWORD']
+
+SENTRY_KEY = os.environ['SENTRY_KEY']
+SENTRY_PROJECT = os.environ['SENTRY_PROJECT']
+SENTRY_URL = "https://{}@sentry.io/{}".format(SENTRY_KEY, SENTRY_PROJECT)
+
 def update_queue():
-    print('Checking...')
+    print('Checking queue...')
     client = SteamClient()
 
     result = client.anonymous_login()
@@ -47,12 +58,22 @@ def update_queue():
 
     client.logout()
 
-print('queue-updater will start in 15 seconds...')
-time.sleep(15)
-print('queue-updater started')
+if __name__ == "__main__":
+    print('queue-updater will start in 15 seconds...')
+    time.sleep(15)
+    print('queue-updater is starting...')
 
-schedule.every().minute.do(update_queue)
+    sentry_sdk.init(
+        SENTRY_URL,
+        server_name = 'queue-updater'
+    )
 
-while 1:
-    schedule.run_pending()
-    time.sleep(1)
+    try:
+        schedule.every().minute.do(update_queue)
+
+        while 1:
+            schedule.run_pending()
+            time.sleep(1)
+
+    except Exception as e:
+        sentry_sdk.capture_exception(e)
