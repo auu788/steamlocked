@@ -2,17 +2,26 @@
 import gevent.monkey
 gevent.monkey.patch_all()
 
+import os
 import time
+import datetime
 import pymysql.cursors
+
+MYSQL_HOST = "mariadb"
+MYSQL_DATABASE = os.environ['MYSQL_DATABASE']
+MYSQL_USER = os.environ['MYSQL_USER']
+MYSQL_PASSWORD = os.environ['MYSQL_PASSWORD']
 
 print("DB preparations will start in 10 seconds...")
 time.sleep(10)
+
 print("DB preparations started")
+
 conn = pymysql.connect(
-    host='mariadb',
-    user='test-user',
-    password='userPWD',
-    db='test-db',
+    host=MYSQL_HOST,
+    user=MYSQL_USER,
+    password=MYSQL_PASSWORD,
+    db=MYSQL_DATABASE,
     charset='utf8mb4',
     cursorclass=pymysql.cursors.DictCursor)
 
@@ -54,14 +63,9 @@ try:
             name VARCHAR(255), \
             PRIMARY KEY (appid))"
 
-        changenumber_table = "CREATE TABLE IF NOT EXISTS `changenumber` ( \
-            current_change_number INTEGER NOT NULL, \
-            update_time VARCHAR(255))"
-
         cursor.execute(apps_table)
         cursor.execute(packages_table)
         cursor.execute(new_releases_table)
-        cursor.execute(changenumber_table)
     conn.commit()
     print("DB preparation done successfully")
 finally:

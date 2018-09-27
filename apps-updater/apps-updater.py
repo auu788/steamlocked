@@ -13,6 +13,8 @@ from datetime import datetime
 from steam import SteamClient
 from steam.enums import EResult
 
+LOG_PREFIX = "[apps-updater] "
+
 MYSQL_HOST = "mariadb"
 MYSQL_DATABASE = os.environ['MYSQL_DATABASE']
 MYSQL_USER = os.environ['MYSQL_USER']
@@ -59,7 +61,7 @@ def handle_db_connection():
     return conn
 
 def update_db_with_app(app):
-    print('App: {}'.format(app))
+    print(LOG_PREFIX + 'App: {}'.format(app))
 
     conn = handle_db_connection()
     updated_at = datetime.utcnow()
@@ -107,9 +109,50 @@ def update_db_with_app(app):
         conn.commit()
     finally:
         conn.close()
+        
+def update_db_with_existing_app(app):
+    print(LOG_PREFIX + 'Existing app: {}'.format(app))
+
+    conn = handle_db_connection()
+    updated_at = datetime.utcnow()
+
+    try:
+        with conn.cursor() as cursor:
+            sql = "UPDATE `apps` SET\
+                    appid=%s, \
+                    name=%s, \
+                    type=%s, \
+                    developer=%s, \
+                    publisher=%s, \
+                    release_date=%s, \
+                    dlcforappid=%s, \
+                    isfreeapp=%s, \
+                    section_type=%s, \
+                    releasestate=%s, \
+                    updated_at=%s \
+                WHERE EXISTS(SELECT appid \
+                    FROM `apps` \
+                    WHERE appid=%s)"
+
+            cursor.execute(sql, (
+                app['app_id'], 
+                app['name'],
+                app['app_type'],
+                app['developer'], 
+                app['publisher'], 
+                app['release_date'], 
+                app['dlc_app_id'],
+                app['is_free_app'], 
+                app['section_type'], 
+                app['release_state'],
+                updated_at,
+                app['app_id']))
+        conn.commit()
+    finally:
+        conn.close()
 
 def update_db_with_package(package, app_id):
-    print('Package: {} - {}'.format(app_id, package))
+    print(LOG_PREFIX + 'Package: {} - {}'.format(app_id, package))
     conn = handle_db_connection()
     updated_at = datetime.utcnow()
 
@@ -173,7 +216,10 @@ def handle_app(app, app_to_packages):
         'dlc_app_id': dlc_app_id
     }
 
-    update_db_with_app(app_json)
+    if len(app_to_packages[app_id]) > 0:
+        update_db_with_app(app_json)
+    else:
+        update_db_with_existing_app(app_json)
     
     for package_json in app_to_packages[app_id]:
         update_db_with_package(package_json, app_id)
@@ -194,16 +240,13 @@ def is_valid_app(app):
     apptype = app.get('common', {}).get('type', '').lower()
 
     if (apptype != 'game' and apptype != 'dlc') or releasestate == 'prerelease':
-        print('[{}] releasestate: {}, apptype: {}'.format(app.get('appid'), releasestate, apptype))
+        print(LOG_PREFIX + '[{}] releasestate: {}, apptype: {}'.format(app.get('appid'), releasestate, apptype))
         return False
     
     return True
 
-def update_changenumber(changenumber):
-    print('Changenumber: {}'.format(changenumber))
-
 def str2bool(v):
-    if v != None:
+    if v:
         return v in ('1', 'true', 'True', 1)
     
     return False
@@ -223,7 +266,7 @@ def run_apps_updater(redis):
         app_to_packages = list_of_jsons_to_json(apps)
         app_ids = app_to_packages.keys()
 
-        print('Fetched {} apps from queue...'.format(len(app_ids)))
+        print(LOG_PREFIX + 'Fetched {} apps from queue...'.format(len(app_ids)))
 
         if not app_ids:
             time.sleep(5)
@@ -240,17 +283,16 @@ def run_apps_updater(redis):
                 
                 break
             except AttributeError:
-                print('Didn\'t get any apps, retrying in 5 seconds...')
+                print(LOG_PREFIX + 'Didn\'t get any apps, retrying in 5 seconds...')
                 time.sleep(5)
             
-        update_changenumber(changenumber)
-        print('Batch completed, retry in 10 seconds...')
+        print(LOG_PREFIX + 'Batch completed, retry in 10 seconds...')
         time.sleep(10)
 
 if __name__ == "__main__":
-    print('apps-updater will start in 15 seconds...')
+    print(LOG_PREFIX + 'Starting in 15 seconds...')
     time.sleep(15)
-    print('apps-updater is starting...')
+    print(LOG_PREFIX + 'Starting...')
 
     sentry_sdk.init(
         SENTRY_URL,

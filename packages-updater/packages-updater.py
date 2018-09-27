@@ -9,17 +9,14 @@ import sentry_sdk
 from steam import SteamClient
 from steam.enums import EResult
 
-MYSQL_HOST = "mariadb"
-MYSQL_DATABASE = os.environ['MYSQL_DATABASE']
-MYSQL_USER = os.environ['MYSQL_USER']
-MYSQL_PASSWORD = os.environ['MYSQL_PASSWORD']
+LOG_PREFIX = "[packages-updater] "
 
 SENTRY_KEY = os.environ['SENTRY_KEY']
 SENTRY_PROJECT = os.environ['SENTRY_PROJECT']
 SENTRY_URL = "https://{}@sentry.io/{}".format(SENTRY_KEY, SENTRY_PROJECT)
 
 def handle_package(package, redis):
-    print('Package: {}'.format(package))
+    print(LOG_PREFIX + 'Package: {}'.format(package))
     package_id = package.get('packageid')
     billing_type = package.get('billingtype')
     allow_cross_region_trading_and_gifting = str2bool(package.get('extended', {}).get('allowcrossregiontradingandgifting'))
@@ -37,7 +34,7 @@ def handle_package(package, redis):
     }
 
     for app_id in package.get('appids', {}).values():
-        print('Appid: {}'.format(app_id))
+        print(LOG_PREFIX + 'Appid: {}'.format(app_id))
         app = {
             "app_id": app_id,
             "package": package_json
@@ -51,7 +48,7 @@ def connect_to_steam():
     result = client.anonymous_login()
 
     if result != EResult.OK:
-        print("Failed to login: {}".format(result))
+        print(LOG_PREFIX + "Failed to login: {}".format(result))
         raise SystemExit
     
     return client
@@ -65,11 +62,8 @@ def is_valid_package(package):
     
     return True
 
-def update_changenumber(changenumber):
-    print('Changenumber: {}'.format(changenumber))
-
 def str2bool(v):
-    if v != None:
+    if v:
         return v in ("1", "true", "True", 1)
     
     return False
@@ -86,13 +80,12 @@ def run_packages_updater(redis):
         changenumber = pipe_response[0]
         package_ids = [int(num) for num in pipe_response[1]]
 
-        print('Fetched {} packages from queue...'.format(len(package_ids)))
+        print(LOG_PREFIX + 'Fetched {} packages from queue...'.format(len(package_ids)))
 
         if not package_ids:
             time.sleep(5)
             continue
 
-        # print(package_ids)
         client = connect_to_steam()
         while True:
             try:
@@ -104,17 +97,16 @@ def run_packages_updater(redis):
                 
                 break
             except AttributeError:
-                print('Didn\'t get any products, retrying in 5 seconds...')
+                print(LOG_PREFIX + 'Didn\'t get any products, retrying in 5 seconds...')
                 time.sleep(5)
             
-        update_changenumber(changenumber)
-        print('Batch completed, retry in 10 seconds...')
+        print(LOG_PREFIX + 'Batch completed, retry in 10 seconds...')
         time.sleep(10)
 
 if __name__ == "__main__":
-    print('packages-updater will start in 15 seconds...')
+    print(LOG_PREFIX + 'Starting in 15 seconds...')
     time.sleep(15)
-    print('packages-updater is starting...')
+    print(LOG_PREFIX + 'Starting...')
 
     sentry_sdk.init(
         SENTRY_URL,
@@ -133,4 +125,3 @@ if __name__ == "__main__":
 
     except Exception as e:
         sentry_sdk.capture_exception(e)
-
