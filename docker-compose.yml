@@ -12,25 +12,48 @@ services:
     volumes:
       - ${PWD}/data:/var/lib/mysql
     environment:
-      MYSQL_ROOT_PASSWORD: rootPWD
-      MYSQL_USER: test-user
-      MYSQL_PASSWORD: userPWD
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
   db-setup:
     build: ./db-setup
     depends_on:
       - mariadb
-  # apps-updater:
-  #   build: ./apps-updater
-  #   depends_on:
-  #     - redis
-  #     - db-setup
-  # packages-updater:
-  #   build: ./packages-updater
-  #   depends_on:
-  #     - redis
-  #     - db-setup
-  # queue-updater:
-  #   build: ./queue-updater
-  #   depends_on:
-  #     - redis
-  #     - db-setup
+    environment:
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+  apps-updater:
+    build: ./apps-updater
+    depends_on:
+      - redis
+      - db-setup
+    environment:
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      SENTRY_KEY: ${SENTRY_KEY}
+      SENTRY_PROJECT: ${SENTRY_PROJECT}
+  packages-updater:
+    build: ./packages-updater
+    depends_on:
+      - redis
+      - db-setup
+    environment:
+      SENTRY_KEY: ${SENTRY_KEY}
+      SENTRY_PROJECT: ${SENTRY_PROJECT}
+  queue-updater:
+    build: ./queue-updater
+    depends_on:
+      - redis
+      - db-setup
+    environment:
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      SENTRY_KEY: ${SENTRY_KEY}
+      SENTRY_PROJECT: ${SENTRY_PROJECT}
+      CHANGENUMBER_INIT: ${CHANGENUMBER_INIT}
+      PACKAGES_MANUAL_START: ${PACKAGES_MANUAL_START}
+      PACKAGES_MANUAL_END: ${PACKAGES_MANUAL_END}

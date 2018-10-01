@@ -2,27 +2,36 @@
 import gevent.monkey
 gevent.monkey.patch_all()
 
+import os
 import time
+import datetime
 import pymysql.cursors
 
-time.sleep(5)
+MYSQL_HOST = "mariadb"
+MYSQL_DATABASE = os.environ['MYSQL_DATABASE']
+MYSQL_USER = os.environ['MYSQL_USER']
+MYSQL_PASSWORD = os.environ['MYSQL_PASSWORD']
+
+print("DB preparations will start in 10 seconds...")
+time.sleep(10)
+
+print("DB preparations started")
+
 conn = pymysql.connect(
-    host='mariadb',
-    user='root',
-    password='rootPWD',
+    host=MYSQL_HOST,
+    user=MYSQL_USER,
+    password=MYSQL_PASSWORD,
+    db=MYSQL_DATABASE,
     charset='utf8mb4',
     cursorclass=pymysql.cursors.DictCursor)
 
 try:
     with conn.cursor() as cursor:
-        cursor.execute('DROP DATABASE IF EXISTS `test-db`')
+        database_collation = "ALTER DATABASE `test-db` \
+            CHARACTER SET `utf8mb4` \
+            COLLATE `utf8mb4_unicode_ci`"
 
-        database_creation = "CREATE DATABASE IF NOT EXISTS `test-db` \
-            COLLATE=`utf8mb4_unicode_ci`"
-
-        cursor.execute(database_creation)
-
-        cursor.execute('USE `test-db`')    
+        cursor.execute(database_collation)
         
         apps_table = "CREATE TABLE IF NOT EXISTS `apps` ( \
             appid INTEGER NOT NULL, \
@@ -54,14 +63,10 @@ try:
             name VARCHAR(255), \
             PRIMARY KEY (appid))"
 
-        changenumber_table = "CREATE TABLE IF NOT EXISTS `changenumber` ( \
-            current_change_number INTEGER NOT NULL, \
-            update_time VARCHAR(255))"
-
         cursor.execute(apps_table)
         cursor.execute(packages_table)
         cursor.execute(new_releases_table)
-        cursor.execute(changenumber_table)
     conn.commit()
+    print("DB preparation done successfully")
 finally:
     conn.close()
