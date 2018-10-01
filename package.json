@@ -1,0 +1,30 @@
+{
+  "name": "steamlocked-api",
+  "version": "1.0.0",
+  "description": "API service for Steamlocked website.",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "babel-node ./src/server.js",
+    "build": "babel src -d dist",
+    "serve": "node dist/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/auu788/steamlocked-api.git"
+  },
+  "author": "auu788",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/auu788/steamlocked-api/issues"
+  },
+  "homepage": "https://github.com/auu788/steamlocked-api#readme",
+  "dependencies": {
+    "express": "^4.15.4",
+    "lodash": "^4.17.4",
+    "mysql": "^2.14.1"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1"
+  }
+}
