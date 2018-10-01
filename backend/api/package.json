@@ -10,14 +10,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/auu788/steamlocked-api.git"
+    "url": "git+https://github.com/auu788/steamlocked.git"
   },
   "author": "auu788",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/auu788/steamlocked-api/issues"
+    "url": "https://github.com/auu788/steamlocked/issues"
   },
-  "homepage": "https://github.com/auu788/steamlocked-api#readme",
+  "homepage": "https://github.com/auu788/steamlocked#readme",
   "dependencies": {
     "express": "^4.15.4",
     "lodash": "^4.17.4",
