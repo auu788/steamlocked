@@ -1,0 +1,14 @@
+#error-page-wrapper {
+    width: 100%;
+    margin-top: 150px;
+    display: block;
+    text-align: center;
+}
+
+#fzf {
+    font-size: 100px !important;
+}
+
+#error-page-wrapper > span {
+    font-size: 44px;
+}

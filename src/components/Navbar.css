@@ -1,0 +1,130 @@
+#navbar {
+    width: 1040px;
+    margin: 0 auto;
+    margin-top: 3px;
+    height: 50px;
+    display: flex;
+}
+
+#navbar a:hover {
+    text-decoration: none;
+}
+
+#input-group {
+    margin-right: 0;
+    position: relative;
+    height: 100%;
+    width: 100%;    
+}
+
+#clear-button {
+    position: absolute;
+    right: 20px;
+    top: -5px;
+    font-size: 45px;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.85);
+    transition: color .3s ease-out;
+}
+
+#clear-button:hover {
+    color: #7BBB14;
+}
+
+#clear-button:focus {
+    outline: none;
+}
+
+.button {
+    display: block;
+    height: calc(100% - 4px);
+    background-color: inherit;
+    border: 2px solid rgba(255, 255, 255, 0.85);
+    border-radius: 5px;
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 19px;
+    text-decoration: none;
+    text-align: center;
+    transition: color .3s ease-out, border .3s ease-out;
+    
+}
+
+#home-button {
+    flex: 0 0 80px;
+    line-height: 45px;
+    margin-right: 5px;
+}
+
+#list-button {
+    flex: 0 0 200px;
+}
+
+.button:hover {
+    border: 2px solid #7BBB14;
+    color: #7BBB14;
+}
+
+#search-input {
+    width: calc(100% - 60px - 60px);
+    height: calc(100% - 2px);
+    padding: 0;
+    padding-right: 60px;
+    border: none;
+    background-color: inherit;
+    border-bottom: 3px solid rgba(255, 255, 255, 0.85);
+    transition: border 0.3s ease-out;
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 35px;
+    padding-left: 53px;
+    background: url("../images/search-icon.svg") no-repeat;
+    background-size: 35px;
+    background-position: left 3px center;
+}
+
+#search-input:focus {
+    border-bottom: 3px solid #7BBB14;
+    border-radius: 0;
+    outline: none;
+}
+
+@media (max-width: 1040px) {
+    #navbar {
+        width: 99%; 
+    }
+}
+
+@media (max-width: 560px) {
+    #navbar {
+        width: 99%;
+        height: 35px;
+    }
+
+    #input-group {
+        width: 100% !important;
+    }
+
+    #search-input {
+        width: calc(100% - 40px - 40px);
+        background-size: 25px;
+        font-size: 20px;
+        padding-left: 33px;
+        padding-right: 40px;
+    }
+
+    #clear-button {
+        font-size: 40px;
+        top: -10px;
+        right: 20px;
+    }
+
+    #list-button {
+        flex: 0 0 85px;
+        font-size: 12px;
+    }
+
+    #home-button {
+        flex: 0 0 60px;
+        line-height: 30px;
+    }
+}

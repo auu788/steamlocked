@@ -1,0 +1,49 @@
+#wrapper {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+}
+
+#search-results-wrapper, #app-info-wrapper, #new-releases-wrapper, #list-wrapper, #error-page-wrapper {
+    flex: 1;
+}
+
+@media screen and (min-width: 1140px) {
+    #footer {
+        width: 800px;
+    }
+}
+
+@media screen and (max-width: 1139px) {
+    #footer {
+        width: calc(100% - 20px);
+    }
+
+    #footer-content {
+        font-size: 12px;
+    }
+
+    #disclaimer {
+        font-size: 10px;
+    }
+}
+
+#footer {
+    margin: 50px auto 0 auto;
+    border-top: 2px solid rgba(255, 255, 255, 0.85);
+    padding: 10px;
+}
+
+#footer-content {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+}
+
+#disclaimer {
+    padding-top: 10px;
+    display: block;
+    text-align: center;
+    font-size: 12px;
+    opacity: 0.7;
+}

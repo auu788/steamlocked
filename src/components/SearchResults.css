@@ -1,0 +1,11 @@
+#search-results-wrapper {
+    margin: 0 auto;
+    margin-top: 70px;
+    width: 1040px;
+}
+
+@media screen and (max-width: 1040px) {
+    #search-results-wrapper {
+        width: 100%;
+    }
+}
