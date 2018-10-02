@@ -1,0 +1,20 @@
+FROM node:8 as build-stage
+
+# Bulding React app
+WORKDIR /app
+COPY package*.json /app/
+RUN npm install
+COPY ./ /app/
+RUN npm run build
+
+# Configuring & running nginx
+FROM nginx:latest
+COPY --from=build-stage /app/build/ /var/www/steamlocked.com/html
+COPY ./nginx/nginx.conf /etc/nginx/nginx.conf
+COPY ./nginx/beta.api.steamlocked.com.conf /etc/nginx/sites-available/beta.api.steamlocked.com.conf
+COPY ./nginx/beta.steamlocked.com.conf /etc/nginx/sites-available/beta.steamlocked.com.conf
+
+RUN chmod -R 755 /var/www
+RUN mkdir /etc/nginx/sites-enabled
+RUN ln -s /etc/nginx/sites-available/beta.api.steamlocked.com.conf /etc/nginx/sites-enabled/
+RUN ln -s /etc/nginx/sites-available/beta.steamlocked.com.conf /etc/nginx/sites-enabled/

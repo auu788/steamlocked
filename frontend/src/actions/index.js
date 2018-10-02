@@ -7,7 +7,7 @@ export const FETCH_APP_INFO_FAILURE =   'fetch_app_info_failure';
 export const FETCH_LIST =               'fetch_list';
 
 export function fetchSearchResults(searchQuery) {
-    const request = axios.get(`https://api.steamlocked.com/search/${searchQuery}`);
+    const request = axios.get(`https://beta.api.steamlocked.com/search/${searchQuery}`);
 
     return {
         type: FETCH_SEARCH_RESULTS,
@@ -16,7 +16,7 @@ export function fetchSearchResults(searchQuery) {
 }
 
 export function fetchAppInfo(appid) {
-    const request = axios.get(`https://api.steamlocked.com/appid/${appid}`)
+    const request = axios.get(`https://beta.api.steamlocked.com/appid/${appid}`)
 
     return {
         type: FETCH_APP_INFO,
@@ -39,7 +39,7 @@ export function fetchAppInfoFailure(response) {
 }
 
 export function fetchList(country) {
-    const request = axios.get(`https://api.steamlocked.com/list?billingtype=3,10&country=${country}`);
+    const request = axios.get(`https://beta.api.steamlocked.com/list?billingtype=3,10&country=${country}`);
 
     return {
         type: FETCH_LIST,

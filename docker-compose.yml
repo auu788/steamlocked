@@ -26,44 +26,50 @@ services:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
     ports:
       - 3030:3030
-  db-setup:
-    build: ./backend/data-updaters/db-setup
+  web:
+    build: ./frontend
     depends_on:
-      - mariadb
-    environment:
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-  apps-updater:
-    build: ./backend/data-updaters/apps-updater
-    depends_on:
-      - redis
-      - db-setup
-    environment:
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      SENTRY_KEY: ${SENTRY_KEY}
-      SENTRY_PROJECT: ${SENTRY_PROJECT}
-  packages-updater:
-    build: ./backend/data-updaters/packages-updater
-    depends_on:
-      - redis
-      - db-setup
-    environment:
-      SENTRY_KEY: ${SENTRY_KEY}
-      SENTRY_PROJECT: ${SENTRY_PROJECT}
-  queue-updater:
-    build: ./backend/data-updaters/queue-updater
-    depends_on:
-      - redis
-      - db-setup
-    environment:
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      SENTRY_KEY: ${SENTRY_KEY}
-      SENTRY_PROJECT: ${SENTRY_PROJECT}
-      CHANGENUMBER_INIT: ${CHANGENUMBER_INIT}
-      PACKAGES_MANUAL_START: ${PACKAGES_MANUAL_START}
-      PACKAGES_MANUAL_END: ${PACKAGES_MANUAL_END}
+      - api
+    ports:
+      - 8081:80
+  # db-setup:
+  #   build: ./backend/data-updaters/db-setup
+  #   depends_on:
+  #     - mariadb
+  #   environment:
+  #     MYSQL_USER: ${MYSQL_USER}
+  #     MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+  #     MYSQL_DATABASE: ${MYSQL_DATABASE}
+  # apps-updater:
+  #   build: ./backend/data-updaters/apps-updater
+  #   depends_on:
+  #     - redis
+  #     - db-setup
+  #   environment:
+  #     MYSQL_USER: ${MYSQL_USER}
+  #     MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+  #     MYSQL_DATABASE: ${MYSQL_DATABASE}
+  #     SENTRY_KEY: ${SENTRY_KEY}
+  #     SENTRY_PROJECT: ${SENTRY_PROJECT}
+  # packages-updater:
+  #   build: ./backend/data-updaters/packages-updater
+  #   depends_on:
+  #     - redis
+  #     - db-setup
+  #   environment:
+  #     SENTRY_KEY: ${SENTRY_KEY}
+  #     SENTRY_PROJECT: ${SENTRY_PROJECT}
+  # queue-updater:
+  #   build: ./backend/data-updaters/queue-updater
+  #   depends_on:
+  #     - redis
+  #     - db-setup
+  #   environment:
+  #     MYSQL_USER: ${MYSQL_USER}
+  #     MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+  #     MYSQL_DATABASE: ${MYSQL_DATABASE}
+  #     SENTRY_KEY: ${SENTRY_KEY}
+  #     SENTRY_PROJECT: ${SENTRY_PROJECT}
+  #     CHANGENUMBER_INIT: ${CHANGENUMBER_INIT}
+  #     PACKAGES_MANUAL_START: ${PACKAGES_MANUAL_START}
+  #     PACKAGES_MANUAL_END: ${PACKAGES_MANUAL_END}
