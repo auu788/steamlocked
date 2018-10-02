@@ -81,7 +81,7 @@ export const getAppidInfo = async (req, res, next) => {
                     FROM apps \
                     WHERE (releasestate<>'prerelease' or releasestate IS NULL) AND appid = ?";
     
-    let packagesQuery = "SELECT subid, subid_name, billingtype, AllowPurchaseFromRestrictedCountries, PurchaseRestrictedCountries, AllowCrossRegionTradingAndGifting, onlyallowrunincountries \
+    let packagesQuery = "SELECT subid, billingtype, AllowPurchaseFromRestrictedCountries, PurchaseRestrictedCountries, AllowCrossRegionTradingAndGifting, onlyallowrunincountries \
                         FROM packages \
                         WHERE appid = ?";
 
@@ -141,51 +141,57 @@ export const getList = async (req, res, next) => {
     console.log(`[REQUEST] ${req.url}`);
 	res.header("Access-Control-Allow-Origin", "*");
 	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    let billingtype = req.query.billingtype.split(',').map(Number).filter(Number.isInteger);
+    let billingtype = req.query.billingtype;
     let country = req.query.country;
-
-    if (!req.query.billingtype || !country) {
+    
+    if (!billingtype || !country) {
         res.status(400).json({
             "success": false,
             "info": "There have to be 2 parameters, country and billingtype."
         });
+        return;
     }
-    else if (billingtype.length > 2 || billingtype.length < 1) {
+
+    let billingtypes = billingtype.split(',').map(Number).filter(Number.isInteger);
+
+    if (billingtypes.length > 2 || billingtypes.length < 1) {
         res.status(400).json({
             "success": false,
             "info": "Billingtype has to be number and there are allowed only two values separated by comma."
         });
+        return;
     }
-    else if (country.length !== 2 || !/^[a-zA-Z]+$/.test(country)) {
+    
+    if (country.length !== 2 || !/^[a-zA-Z]+$/.test(country)) {
         res.status(400).json({
             "success": false,
             "info": "Country has to be 2-letter code."
         });
+        return;
     }
-    else {
-        let billingtypeSqlQuery = billingtype.map((elem) => {
-            return "billingtype = " + elem;
-        }).join(" OR ");
-        billingtypeSqlQuery = "AND (" + billingtypeSqlQuery + ")";
 
-        let sqlQuery = "SELECT DISTINCT apps.appid, name \
-                        FROM apps \
-                        JOIN packages ON apps.appid = packages.appid \
-                        WHERE type = 'Game' AND AllowPurchaseFromRestrictedCountries = 1 \
-                            AND (releasestate <> 'prerelase' OR releasestate IS NULL) \
-                            AND PurchaseRestrictedCountries LIKE ? \
-                            " + billingtypeSqlQuery + " \
-                        ORDER BY name"
+    let billingtypeSqlQuery = billingtypes.map((elem) => {
+        return "billingtype = " + elem;
+    }).join(" OR ");
+    billingtypeSqlQuery = "AND (" + billingtypeSqlQuery + ")";
+
+    let sqlQuery = "SELECT DISTINCT apps.appid, name \
+                    FROM apps \
+                    JOIN packages ON apps.appid = packages.appid \
+                    WHERE type = 'Game' AND AllowPurchaseFromRestrictedCountries = 1 \
+                        AND (releasestate <> 'prerelase' OR releasestate IS NULL) \
+                        AND PurchaseRestrictedCountries LIKE ? \
+                        " + billingtypeSqlQuery + " \
+                    ORDER BY name"
+    
+    let query = db.query(sqlQuery, '%'+country+'%', (err, results) => {
+        if (err) throw err;
         
-        let query = db.query(sqlQuery, '%'+country+'%', (err, results) => {
-            if (err) throw err;
-            
-            res.status(200).json({
-                "success": true,
-                "country": country,
-                "billingtype": billingtype,
-                "payload": results
-            });
+        res.status(200).json({
+            "success": true,
+            "country": country,
+            "billingtype": billingtypes,
+            "payload": results
         });
-    }
+    });
 }

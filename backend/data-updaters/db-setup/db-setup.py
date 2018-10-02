@@ -12,8 +12,8 @@ MYSQL_DATABASE = os.environ['MYSQL_DATABASE']
 MYSQL_USER = os.environ['MYSQL_USER']
 MYSQL_PASSWORD = os.environ['MYSQL_PASSWORD']
 
-print("DB preparations will start in 10 seconds...")
-time.sleep(10)
+# print("DB preparations will start in 10 seconds...")
+# time.sleep(10)
 
 print("DB preparations started")
 
