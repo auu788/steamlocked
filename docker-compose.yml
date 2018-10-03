@@ -31,7 +31,7 @@ services:
     depends_on:
       - api
     ports:
-      - 8081:80
+      - 80:80
   # db-setup:
   #   build: ./backend/data-updaters/db-setup
   #   depends_on:
