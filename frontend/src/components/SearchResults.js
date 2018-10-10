@@ -19,21 +19,21 @@ const SearchResults = (props) => {
 
     let gamesCount, dlcsCount;
 
-    if (!_.isEmpty(props.results.Game)) {
-        gamesCount = (Object.keys(props.results.Game).length === 1) ? '1 Game' : `${Object.keys(props.results.Game).length} Games`;        
+    if (!_.isEmpty(props.results.game)) {
+        gamesCount = (Object.keys(props.results.game).length === 1) ? '1 Game' : `${Object.keys(props.results.game).length} Games`;        
     }
     
-    if (!_.isEmpty(props.results.DLC)) {
-        dlcsCount = (Object.keys(props.results.DLC).length === 1) ? '1 DLC' : `${Object.keys(props.results.DLC).length} DLCs`;        
+    if (!_.isEmpty(props.results.dlc)) {
+        dlcsCount = (Object.keys(props.results.dlc).length === 1) ? '1 DLC' : `${Object.keys(props.results.dlc).length} DLCs`;        
     }
 
     return (
         <div id="search-results-wrapper">
-            {!_.isEmpty(props.results.Game) &&
-            <AppResults results={props.results.Game} categoryName={gamesCount} />}
+            {!_.isEmpty(props.results.game) &&
+            <AppResults results={props.results.game} categoryName={gamesCount} />}
 
-            {!_.isEmpty(props.results.DLC) &&
-            <AppResults results={props.results.DLC} categoryName={dlcsCount} />}
+            {!_.isEmpty(props.results.dlc) &&
+            <AppResults results={props.results.dlc} categoryName={dlcsCount} />}
         </div>
     );
 }

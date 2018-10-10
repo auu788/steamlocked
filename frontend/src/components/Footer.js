@@ -14,12 +14,12 @@ class Footer extends Component {
     }
 
     componentDidMount() {
-        const url = 'https://api.beta.steamlocked.com/timeUpdate';
+        const url = 'https://apibeta.steamlocked.com/timeUpdate';
         
         axios.get(url)
         .then((response) => {
             this.setState({
-                time: response.data.payload[0].update_time
+                time: response.data.payload[0].updated_at
             });
         });
     }

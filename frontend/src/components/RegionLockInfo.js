@@ -233,9 +233,9 @@ class RegionLockInfoWrapper extends Component {
     }
 
     async getIPAdress() {
-        const request = await axios.get('https://freegeoip.net/json/');
+        const request = await axios.get('https://ipapi.co/json/');
 
-        return request.data.country_code;
+        return request.data.country;
     }
 
     render() {

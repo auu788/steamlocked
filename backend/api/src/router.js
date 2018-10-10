@@ -9,19 +9,19 @@ import {
 
 const router = Router();
 
-router.route('/api/timeUpdate')
+router.route('/timeUpdate')
     .get(getTimeUpdate);
 
-router.route('/api/newReleases')
+router.route('/newReleases')
     .get(getNewReleases);
 
-router.route('/api/search/:searchQuery')
+router.route('/search/:searchQuery')
     .get(getSearchResults);
 
-router.route('/api/appid/:appid(\\d+)')
+router.route('/appid/:appid(\\d+)')
     .get(getAppidInfo);
 
-router.route('/api/list')
+router.route('/list')
     .get(getList);
 
 export default router;

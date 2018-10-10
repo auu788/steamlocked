@@ -6,7 +6,7 @@ export const getTimeUpdate = async (req, res, next) => {
     console.log(`[REQUEST] ${req.url}`);
 	res.header("Access-Control-Allow-Origin", "*");
 	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    let sqlQuery = 'SELECT update_time FROM changenumber';
+    let sqlQuery = 'SELECT updated_at FROM apps ORDER BY updated_at DESC LIMIT 1';
 	
     db.query(sqlQuery, (err, results) => {
         res.status(200).json({

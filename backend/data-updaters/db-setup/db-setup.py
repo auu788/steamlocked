@@ -45,7 +45,8 @@ try:
             section_type VARCHAR(255), \
             releasestate VARCHAR(255), \
             updated_at DATETIME, \
-            PRIMARY KEY (appid))"
+            PRIMARY KEY (appid), \
+            FULLTEXT (name))"
         
         packages_table = "CREATE TABLE IF NOT EXISTS `packages` ( \
             appid INTEGER NOT NULL, \
