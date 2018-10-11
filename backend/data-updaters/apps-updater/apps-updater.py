@@ -119,7 +119,6 @@ def update_db_with_existing_app(app):
     try:
         with conn.cursor() as cursor:
             sql = "UPDATE `apps` SET\
-                    appid=%s, \
                     name=%s, \
                     type=%s, \
                     developer=%s, \
@@ -135,7 +134,6 @@ def update_db_with_existing_app(app):
                     WHERE appid=%s)"
 
             cursor.execute(sql, (
-                app['app_id'], 
                 app['name'],
                 app['app_type'],
                 app['developer'], 
@@ -226,7 +224,7 @@ def handle_app(app, app_to_packages):
     
 def connect_to_steam():
     client = SteamClient()
-
+    
     result = client.anonymous_login()
 
     if result != EResult.OK:
@@ -251,13 +249,13 @@ def str2bool(v):
     
     return False
 
-def run_apps_updater(redis):
+def run_apps_updater(redis, client, sentry_sdk):
     while True:
         pipe = redis.pipeline()
 
         pipe.get('current_change')
-        pipe.lrange('apps-queue', 0, 49)
-        pipe.ltrim('apps-queue', 50, -1)
+        pipe.lrange('apps-queue', 0, 0)
+        pipe.ltrim('apps-queue', 1, -1)
 
         pipe_response = pipe.execute()
 
@@ -267,27 +265,32 @@ def run_apps_updater(redis):
         app_ids = app_to_packages.keys()
 
         print(LOG_PREFIX + 'Fetched {} apps from queue...'.format(len(app_ids)))
-
+        
         if not app_ids:
             time.sleep(5)
             continue
 
-        client = connect_to_steam()
+        print(app_ids)
+
         while True:
             try:
-                data = client.get_product_info(apps=app_ids)
+                data = client.get_product_info(apps=app_ids, timeout=15)
 
                 for app in data.get('apps', {}).values():
                     if is_valid_app(app):
                         handle_app(app, app_to_packages)
                 
                 break
-            except AttributeError:
+            except UnicodeDecodeError as e:
+                sentry_sdk.capture_exception(e)
+                break
+            except AttributeError as e:
                 print(LOG_PREFIX + 'Didn\'t get any apps, retrying in 5 seconds...')
+                sentry_sdk.capture_exception(e)
                 time.sleep(5)
             
-        print(LOG_PREFIX + 'Batch completed, retry in 10 seconds...')
-        time.sleep(10)
+        print(LOG_PREFIX + 'Batch completed, retry in 1 seconds...')
+        time.sleep(1)
 
 if __name__ == "__main__":
     print(LOG_PREFIX + 'Starting in 15 seconds...')
@@ -306,8 +309,10 @@ if __name__ == "__main__":
             db=0,
             charset="utf-8",
             decode_responses=True)
-    
-        run_apps_updater(r)
+
+        client = connect_to_steam()
+
+        run_apps_updater(r, client, sentry_sdk)
 
     except Exception as e:
         sentry_sdk.capture_exception(e)
