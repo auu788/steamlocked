@@ -14,37 +14,6 @@ const RegionLockInfoView = (props) => {
             {props.dat}
             {!props.data.regionLocked &&
             <div id="no-region-lock">This game has no region locks!</div>}
-            {/* {props.data.storeLocked &&
-            <div className="locked-countries-wrapper">
-                { <span>Steam Store</span>
-                {props.data.storeLockedCountries.length > 0 &&
-                    <div className="locked-countries">
-                        <span>There is a risk you won't be able to <span style={{color: "#EFBE74"}}>ACTIVATE</span> your copy from these countries</span>
-                        <div className="countries">
-                            {props.data.storeLockedCountries.map((country) => {
-                                return <span key={country.code}><Flag code={country.code} height="11" />{country.name}</span>;
-                            })}
-                        </div>
-                    </div>}
-                {props.data.storeRunLockedCountries.length > 0 &&
-                    <div className="locked-countries">
-                        <span>There is a risk you won't be able to <span style={{color: "#EFBE74"}}>ACTIVATE</span> and <span style={{color: "#EFBE74"}}>RUN</span> your copy from these countries</span>
-                        <div className="countries">
-                            {props.data.storeRunLockedCountries.map((country) => {
-                                return <span key={country.code}><Flag code={country.code} height="11" />{country.name}</span>;
-                            })}
-                        </div>
-                    </div>}
-                {props.data.storeBannedCountries.length > 0 &&
-                    <div className="locked-countries">
-                        <span>Some versions of the game may be <span style={{color: "#EFBE74"}}>banned</span> in your and these countries</span>
-                        <div className="countries">
-                            {props.data.storeBannedCountries.map((country) => {
-                                return <span key={country.code}><Flag code={country.code} height="11" />{country.name}</span>;
-                            })}
-                        </div>
-                    </div>}
-            </div>} } */}
             
             {props.data.keyLocked &&
             <div className="locked-countries-wrapper">
@@ -169,11 +138,6 @@ class RegionLockInfoWrapper extends Component {
                         keyLockedCountries.push(...one.PurchaseRestrictedCountries.split(' '));    
                         keyLocked = true;                    
                     }
-
-                    // if (one.billingtype === 1 || one.billingtype === 10) {
-                    //     storeLockedCountries.push(...one.PurchaseRestrictedCountries.split(' '));
-                    //     storeLocked = true;
-                    // }
                 }
 
                 if (_.includes(one.PurchaseRestrictedCountries, userCountryCode)
@@ -186,11 +150,6 @@ class RegionLockInfoWrapper extends Component {
                         keyBannedCountries.push(...one.PurchaseRestrictedCountries.split(' '));
                         keyLocked = true;                       
                     }
-
-                    // if (one.billingtype === 1 || one.billingtype === 10) {
-                    //     storeBannedCountries.push(...one.PurchaseRestrictedCountries.split(' '));
-                    //     storeLocked = true;
-                    // }
                 }
             }
 
@@ -204,20 +163,10 @@ class RegionLockInfoWrapper extends Component {
                         keyRunLockedCountries.push(...one.onlyallowrunincountries.split(' '));
                         keyLocked = true;                       
                     }
-
-                    // if (one.billingtype === 1 || one.billingtype === 10) {
-                    //     storeRunLockedCountries.push(...one.onlyallowrunincountries.split(' '));
-                    //     storeLocked = true;
-                    // }
                 }
             }
         });
 
-        // storeLockedCountries = _.map(storeLockedCountries, (country) => {
-        //     return COUNTRIES_NAMES_OBJECT[country];
-        // });
-
-        // console.log("REGION LOCK LOCKED", storeLocked, keyLocked);
         this.setState({
             regionLocked,
             storeLocked,

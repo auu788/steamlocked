@@ -18,6 +18,7 @@ services:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
   api:
     build: ./backend/api
+    restart: on-failure
     depends_on:
       - mariadb
     environment:

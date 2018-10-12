@@ -42,8 +42,15 @@ def list_of_jsons_to_json(dict_list):
 
 def get_release_date(appid):
     STEAM_API_URL = 'https://store.steampowered.com/api/appdetails/?filters=release_date&appids=' + str(appid)
+    
+    while True:
+        try:
+            response = requests.get(STEAM_API_URL).json()
+            break
+        except requests.JSONDecodeError:
+            print (LOG_PREFIX + '[' + appid + '] Error while getting release date, retrying in 3 seconds...')
+            time.sleep(3)
 
-    response = requests.get(STEAM_API_URL).json()
     if response.get(str(appid), {}).get('success'):
         return response.get(str(appid), {}).get('data', {}).get('release_date', {}).get('date')
     

@@ -27,6 +27,7 @@ class ListPageContainer extends Component {
 
     onCountryChange(country) {
         this.props.fetchList(country);
+
         this.setState({
             country
         });

@@ -21,8 +21,9 @@ class List extends Component {
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        if ((JSON.stringify(nextProps.gamesList) === JSON.stringify(this.props.gamesList)) &&
-            (this.state.inputValue === nextState.inputValue)) {
+        if ((JSON.stringify(nextProps.gamesList) === JSON.stringify(this.props.gamesList)) 
+            && (this.state.inputValue === nextState.inputValue)
+            && (this.state.shopCountryCode === nextState.shopCountryCode)) {
             return false;
         }
 
@@ -33,6 +34,7 @@ class List extends Component {
         this.setState({
             inputValue: filterQuery.target.value
         });
+        
         this.props.filterQuery(filterQuery.target.value);
     }
 

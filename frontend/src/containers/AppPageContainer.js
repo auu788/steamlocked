@@ -34,13 +34,11 @@ class AppPageContainer extends Component {
 
     render() {
         if (_.isEmpty(this.props.appInfo)) {
-            console.log("TU");
             return (
                 <div id="wrapper">
                 </div>
             )
         } else if (!this.props.appInfo.success) {
-            console.log("ERROR");
             return (
                 <ErrorPage />
             );
