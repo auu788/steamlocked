@@ -279,6 +279,7 @@ def update_db_with_new_released_app(app):
         conn.close()
 
 def update_new_releases():
+    print(LOG_PREFIX + 'Getting new releases...')
     STEAM_API_FEATURED = "http://store.steampowered.com/api/featuredcategories"
 
     while True:
@@ -286,10 +287,11 @@ def update_new_releases():
             response = requests.get(STEAM_API_FEATURED).json()
             break
         except requests.JSONDecodeError:
-            print (LOG_PREFIX + 'Error while getting new releases, retrying in 3 seconds...')
+            print(LOG_PREFIX + 'Error while getting new releases, retrying in 3 seconds...')
             time.sleep(3)
     
     new_releases = response.get('new_releases', {}).get('items', [])
+    print(LOG_PREFIX + 'Fetched {} new released games'.format(len(new_releases)))
 
     for app in new_releases:
         update_db_with_new_released_app(app)    
