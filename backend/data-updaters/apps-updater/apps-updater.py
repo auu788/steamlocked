@@ -302,8 +302,8 @@ def run_apps_updater(redis, client, sentry_sdk):
         pipe = redis.pipeline()
 
         pipe.get('current_change')
-        pipe.lrange('apps-queue', 0, 0)
-        pipe.ltrim('apps-queue', 1, -1)
+        pipe.lrange('apps-queue', 0, 49)
+        pipe.ltrim('apps-queue', 50, -1)
 
         pipe_response = pipe.execute()
 
@@ -325,7 +325,13 @@ def run_apps_updater(redis, client, sentry_sdk):
                 # run new-releases updater every n minutes
                 schedule.run_pending()
                 
-                data = client.get_product_info(apps=app_ids, timeout=15)
+                while True:
+                    data = client.get_product_info(apps=app_ids)
+                    if data is not None:
+                        break
+                    else:
+                        print(LOG_PREFIX + 'Data is None, retrying in 3 seconds...')
+                        time.sleep(3)
 
                 for app in data.get('apps', {}).values():
                     if is_valid_app(app):
