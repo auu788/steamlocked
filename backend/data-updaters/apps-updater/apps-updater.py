@@ -6,6 +6,7 @@ import os
 import ast
 import time
 import redis
+import schedule
 import requests
 import sentry_sdk
 import pymysql.cursors
@@ -256,6 +257,44 @@ def str2bool(v):
     
     return False
 
+def update_db_with_new_released_app(app):
+    print(LOG_PREFIX + '[' + app['id'] + '] New released app: ' + app['name'])
+    conn = handle_db_connection()
+
+    try:
+        with conn.cursor() as cursor:
+            sql = "INSERT INTO `new_releases` \
+                VALUES(%s, %s) \
+                ON DUPLICATE KEY UPDATE \
+                    appid=%s, \
+                    name=%s"
+
+            cursor.execute(sql, (
+                app['id'],
+                app['name'],
+                app['id'], 
+                app['name']))
+        conn.commit()
+    finally:
+        conn.close()
+
+def update_new_releases():
+    STEAM_API_FEATURED = "http://store.steampowered.com/api/featuredcategories"
+
+    while True:
+        try:
+            response = requests.get(STEAM_API_FEATURED).json()
+            break
+        except requests.JSONDecodeError:
+            print (LOG_PREFIX + 'Error while getting new releases, retrying in 3 seconds...')
+            time.sleep(3)
+    
+    new_releases = response.get('new_releases', {}).get('items', [])
+
+    for app in new_releases:
+        update_db_with_new_released_app(app)    
+
+
 def run_apps_updater(redis, client, sentry_sdk):
     while True:
         pipe = redis.pipeline()
@@ -281,6 +320,9 @@ def run_apps_updater(redis, client, sentry_sdk):
 
         while True:
             try:
+                # run new-releases updater every n minutes
+                schedule.run_pending()
+                
                 data = client.get_product_info(apps=app_ids, timeout=15)
 
                 for app in data.get('apps', {}).values():
@@ -308,8 +350,10 @@ if __name__ == "__main__":
         SENTRY_URL,
         server_name = 'apps-updater'
     )
-
+    
     try:
+        schedule.every(10).minutes.do(update_new_releases)
+
         r = redis.StrictRedis(
             host='redis',
             port=6379,
