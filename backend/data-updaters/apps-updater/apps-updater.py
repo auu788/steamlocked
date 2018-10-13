@@ -258,7 +258,7 @@ def str2bool(v):
     return False
 
 def update_db_with_new_released_app(app):
-    print(LOG_PREFIX + '[' + app['id'] + '] New released app: ' + app['name'])
+    print(LOG_PREFIX + '[' + str(app['id']) + '] New released app: ' + app['name'])
     conn = handle_db_connection()
 
     try:
