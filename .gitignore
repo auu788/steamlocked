@@ -183,3 +183,4 @@ typings/
 .env
 
 dist
+.vscode/settings.json

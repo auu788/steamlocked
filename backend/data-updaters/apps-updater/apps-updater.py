@@ -6,6 +6,7 @@ import os
 import ast
 import time
 import redis
+import schedule
 import requests
 import sentry_sdk
 import pymysql.cursors
@@ -256,13 +257,53 @@ def str2bool(v):
     
     return False
 
+def update_db_with_new_released_app(app):
+    print(LOG_PREFIX + '[' + str(app['id']) + '] New released app: ' + app['name'])
+    conn = handle_db_connection()
+
+    try:
+        with conn.cursor() as cursor:
+            sql = "INSERT INTO `new_releases` \
+                VALUES(%s, %s) \
+                ON DUPLICATE KEY UPDATE \
+                    appid=%s, \
+                    name=%s"
+
+            cursor.execute(sql, (
+                app['id'],
+                app['name'],
+                app['id'], 
+                app['name']))
+        conn.commit()
+    finally:
+        conn.close()
+
+def update_new_releases():
+    print(LOG_PREFIX + 'Getting new releases...')
+    STEAM_API_FEATURED = "http://store.steampowered.com/api/featuredcategories"
+
+    while True:
+        try:
+            response = requests.get(STEAM_API_FEATURED).json()
+            break
+        except requests.JSONDecodeError:
+            print(LOG_PREFIX + 'Error while getting new releases, retrying in 3 seconds...')
+            time.sleep(3)
+    
+    new_releases = response.get('new_releases', {}).get('items', [])
+    print(LOG_PREFIX + 'Fetched {} new released games'.format(len(new_releases)))
+
+    for app in new_releases:
+        update_db_with_new_released_app(app)    
+
+
 def run_apps_updater(redis, client, sentry_sdk):
     while True:
         pipe = redis.pipeline()
 
         pipe.get('current_change')
-        pipe.lrange('apps-queue', 0, 0)
-        pipe.ltrim('apps-queue', 1, -1)
+        pipe.lrange('apps-queue', 0, 49)
+        pipe.ltrim('apps-queue', 50, -1)
 
         pipe_response = pipe.execute()
 
@@ -281,7 +322,16 @@ def run_apps_updater(redis, client, sentry_sdk):
 
         while True:
             try:
-                data = client.get_product_info(apps=app_ids, timeout=15)
+                # run new-releases updater every n minutes
+                schedule.run_pending()
+                
+                while True:
+                    data = client.get_product_info(apps=app_ids)
+                    if data is not None:
+                        break
+                    else:
+                        print(LOG_PREFIX + 'Data is None, retrying in 3 seconds...')
+                        time.sleep(3)
 
                 for app in data.get('apps', {}).values():
                     if is_valid_app(app):
@@ -308,8 +358,10 @@ if __name__ == "__main__":
         SENTRY_URL,
         server_name = 'apps-updater'
     )
-
+    
     try:
+        schedule.every(10).minutes.do(update_new_releases)
+
         r = redis.StrictRedis(
             host='redis',
             port=6379,
