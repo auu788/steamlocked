@@ -4,6 +4,12 @@ services:
     image: redis:latest
     ports:
       - 6379:6379
+    volumes:
+      - ./backend/redis/data:/data
+    command:
+      - --dir /data
+      - --appendonly yes
+      - --appendfsync every
   mariadb:
     image: mariadb:latest
     restart: on-failure    
