@@ -3,20 +3,20 @@ services:
   redis:
     image: redis:latest
     ports:
-      - 6379:6379
+      - "127.0.0.1:6379:6379"
     volumes:
-      - ./backend/redis/data:/data
+      - ${PWD}/data/redis:/data
     command:
       - --dir /data
       - --appendonly yes
-      - --appendfsync every
+      - --appendfsync everysec
   mariadb:
     image: mariadb:latest
     restart: on-failure    
     ports:
-      - 3306:3306
+      - "127.0.0.1:3306:3306"
     volumes:
-      - ${PWD}/data:/var/lib/mysql
+      - ${PWD}/data/mariadb:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_USER: ${MYSQL_USER}

@@ -27,19 +27,23 @@ class Consts:
     PACKAGES_MANUAL_START = os.environ.get('PACKAGES_MANUAL_START')
     PACKAGES_MANUAL_END = os.environ.get('PACKAGES_MANUAL_END')
 
-def update_queue():
-    print(Consts.LOG_PREFIX + 'Checking queue...')
+def connect_to_steam():
     client = SteamClient()
-
+    
     result = client.anonymous_login()
 
     if result != EResult.OK:
-        print("Failed to login: %s" % repr(result))
+        print("Failed to login: {}".format(result))
         raise SystemExit
+    
+    return client
+
+def update_queue():
+    print(Consts.LOG_PREFIX + 'Checking queue...')
 
     r = redis.StrictRedis(host='redis', port=6379, db=0, charset="utf-8", decode_responses=True)
     
-    change_number_to_fetch = None
+    changenumber_to_fetch = None
 
     if r.get('current_change_number'):
         changenumber_to_fetch = int(r.get('current_change_number'))
@@ -49,8 +53,15 @@ def update_queue():
         else:
             raise("No changenumber...") 
 
-    res = client.get_changes_since(changenumber_to_fetch, True, True)
-    
+    while True:
+        client = connect_to_steam()
+        res = client.get_changes_since(changenumber_to_fetch, True, True)
+        if res is not None:
+            break
+        else:
+            print(Consts.LOG_PREFIX + 'Changes response is None, retrying in 3 seconds...')
+            time.sleep(3)
+
     print(Consts.LOG_PREFIX + '[{}] Fetched {} package changes and {} app changes...'.format(res.current_change_number, len(res.package_changes), len(res.app_changes)))
 
     redis_pipe = r.pipeline()
@@ -104,4 +115,5 @@ if __name__ == "__main__":
             time.sleep(1)
 
     except Exception as e:
+        print (e)
         sentry_sdk.capture_exception(e)

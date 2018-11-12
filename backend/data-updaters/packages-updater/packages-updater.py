@@ -16,7 +16,7 @@ SENTRY_PROJECT = os.environ['SENTRY_PROJECT']
 SENTRY_URL = "https://{}@sentry.io/{}".format(SENTRY_KEY, SENTRY_PROJECT)
 
 def handle_package(package, redis):
-    print(LOG_PREFIX + 'Package: {}'.format(package))
+    print(LOG_PREFIX + 'Package: {}'.format(package.get('packageid')))
     package_id = package.get('packageid')
     billing_type = package.get('billingtype')
     allow_cross_region_trading_and_gifting = str2bool(package.get('extended', {}).get('allowcrossregiontradingandgifting'))
@@ -34,7 +34,6 @@ def handle_package(package, redis):
     }
 
     for app_id in package.get('appids', {}).values():
-        print(LOG_PREFIX + 'Appid: {}'.format(app_id))
         app = {
             "app_id": app_id,
             "package": package_json
@@ -75,19 +74,21 @@ def run_packages_updater(redis):
         pipe.get('current_change')
         pipe.lrange('packages-queue', 0, 99)
         pipe.ltrim('packages-queue', 100, -1)
+        pipe.llen('packages-queue')
 
         pipe_response = pipe.execute()
         changenumber = pipe_response[0]
         package_ids = [int(num) for num in pipe_response[1]]
+        packages_queue_size = pipe_response[3]
 
-        print(LOG_PREFIX + 'Fetched {} packages from queue...'.format(len(package_ids)))
+        print(LOG_PREFIX + 'Fetched {} packages from queue... ({} packages yet in queue)'.format(len(package_ids), packages_queue_size))
 
         if not package_ids:
             time.sleep(5)
             continue
 
-        client = connect_to_steam()
         while True:
+            client = connect_to_steam()
             try:
                 data = client.get_product_info(packages=package_ids)
 

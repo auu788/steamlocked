@@ -47,7 +47,8 @@ def get_release_date(appid):
     while True:
         try:
             response = requests.get(STEAM_API_URL).json()
-            break
+            if response:
+                break
         except requests.JSONDecodeError:
             print (LOG_PREFIX + '[' + appid + '] Error while getting release date, retrying in 3 seconds...')
             time.sleep(3)
@@ -69,7 +70,7 @@ def handle_db_connection():
     return conn
 
 def update_db_with_app(app):
-    print(LOG_PREFIX + 'App: {}'.format(app))
+    print(LOG_PREFIX + 'App: {}'.format(str(app['app_id'])))
 
     conn = handle_db_connection()
     updated_at = datetime.utcnow()
@@ -119,7 +120,7 @@ def update_db_with_app(app):
         conn.close()
         
 def update_db_with_existing_app(app):
-    print(LOG_PREFIX + 'Existing app: {}'.format(app))
+    print(LOG_PREFIX + 'Existing app: {}'.format(str(app['app_id'])))
 
     conn = handle_db_connection()
     updated_at = datetime.utcnow()
@@ -137,9 +138,7 @@ def update_db_with_existing_app(app):
                     section_type=%s, \
                     releasestate=%s, \
                     updated_at=%s \
-                WHERE EXISTS(SELECT appid \
-                    FROM `apps` \
-                    WHERE appid=%s)"
+                WHERE appid=%s"
 
             cursor.execute(sql, (
                 app['name'],
@@ -158,7 +157,7 @@ def update_db_with_existing_app(app):
         conn.close()
 
 def update_db_with_package(package, app_id):
-    print(LOG_PREFIX + 'Package: {} - {}'.format(app_id, package))
+    print(LOG_PREFIX + 'Package: {} - {}'.format(app_id, str(package['package_id'])))
     conn = handle_db_connection()
     updated_at = datetime.utcnow()
 
@@ -304,6 +303,7 @@ def run_apps_updater(redis, client, sentry_sdk):
         pipe.get('current_change')
         pipe.lrange('apps-queue', 0, 49)
         pipe.ltrim('apps-queue', 50, -1)
+        pipe.llen('apps-queue')
 
         pipe_response = pipe.execute()
 
@@ -311,8 +311,9 @@ def run_apps_updater(redis, client, sentry_sdk):
         apps = [app for app in pipe_response[1]]
         app_to_packages = list_of_jsons_to_json(apps)
         app_ids = app_to_packages.keys()
+        apps_queue_size = pipe_response[3]
 
-        print(LOG_PREFIX + 'Fetched {} apps from queue...'.format(len(app_ids)))
+        print(LOG_PREFIX + 'Fetched {} apps from queue... ({} apps yet in queue)'.format(len(app_ids), apps_queue_size))
         
         if not app_ids:
             time.sleep(5)
@@ -332,6 +333,7 @@ def run_apps_updater(redis, client, sentry_sdk):
                     else:
                         print(LOG_PREFIX + 'Data is None, retrying in 3 seconds...')
                         time.sleep(3)
+                        client = connect_to_steam()
 
                 for app in data.get('apps', {}).values():
                     if is_valid_app(app):
