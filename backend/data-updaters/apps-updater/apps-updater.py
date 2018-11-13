@@ -4,6 +4,7 @@ gevent.monkey.patch_all()
 
 import os
 import ast
+import json
 import time
 import redis
 import schedule
@@ -15,6 +16,7 @@ from steam import SteamClient
 from steam.enums import EResult
 
 LOG_PREFIX = "[apps-updater] "
+REDIS_BATCH_SIZE = 50
 
 MYSQL_HOST = "mariadb"
 MYSQL_DATABASE = os.environ['MYSQL_DATABASE']
@@ -49,7 +51,7 @@ def get_release_date(appid):
             response = requests.get(STEAM_API_URL).json()
             if response:
                 break
-        except requests.JSONDecodeError:
+        except json.decoder.JSONDecodeError:
             print (LOG_PREFIX + '[' + appid + '] Error while getting release date, retrying in 3 seconds...')
             time.sleep(3)
 
@@ -285,7 +287,7 @@ def update_new_releases():
         try:
             response = requests.get(STEAM_API_FEATURED).json()
             break
-        except requests.JSONDecodeError:
+        except json.decoder.JSONDecodeError:
             print(LOG_PREFIX + 'Error while getting new releases, retrying in 3 seconds...')
             time.sleep(3)
     
@@ -301,8 +303,7 @@ def run_apps_updater(redis, client, sentry_sdk):
         pipe = redis.pipeline()
 
         pipe.get('current_change')
-        pipe.lrange('apps-queue', 0, 49)
-        pipe.ltrim('apps-queue', 50, -1)
+        pipe.lrange('apps-queue', 0, REDIS_BATCH_SIZE - 1)
         pipe.llen('apps-queue')
 
         pipe_response = pipe.execute()
@@ -311,7 +312,7 @@ def run_apps_updater(redis, client, sentry_sdk):
         apps = [app for app in pipe_response[1]]
         app_to_packages = list_of_jsons_to_json(apps)
         app_ids = app_to_packages.keys()
-        apps_queue_size = pipe_response[3]
+        apps_queue_size = pipe_response[2]
 
         print(LOG_PREFIX + 'Fetched {} apps from queue... ({} apps yet in queue)'.format(len(app_ids), apps_queue_size))
         
@@ -347,9 +348,10 @@ def run_apps_updater(redis, client, sentry_sdk):
                 print(LOG_PREFIX + 'Didn\'t get any apps, retrying in 5 seconds...')
                 sentry_sdk.capture_exception(e)
                 time.sleep(5)
-            
-        print(LOG_PREFIX + 'Batch completed, retry in 1 seconds...')
-        time.sleep(1)
+        
+        redis.ltrim('apps-queue', REDIS_BATCH_SIZE, -1)
+        print(LOG_PREFIX + 'Batch completed, retry in 3 seconds...')
+        time.sleep(3)
 
 if __name__ == "__main__":
     print(LOG_PREFIX + 'Starting in 15 seconds...')

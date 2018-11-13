@@ -14,6 +14,7 @@ LOG_PREFIX = "[packages-updater] "
 SENTRY_KEY = os.environ['SENTRY_KEY']
 SENTRY_PROJECT = os.environ['SENTRY_PROJECT']
 SENTRY_URL = "https://{}@sentry.io/{}".format(SENTRY_KEY, SENTRY_PROJECT)
+REDIS_BATCH_SIZE = 100
 
 def handle_package(package, redis):
     print(LOG_PREFIX + 'Package: {}'.format(package.get('packageid')))
@@ -72,14 +73,13 @@ def run_packages_updater(redis):
         pipe = redis.pipeline()
 
         pipe.get('current_change')
-        pipe.lrange('packages-queue', 0, 99)
-        pipe.ltrim('packages-queue', 100, -1)
+        pipe.lrange('packages-queue', 0, REDIS_BATCH_SIZE - 1)
         pipe.llen('packages-queue')
 
         pipe_response = pipe.execute()
         changenumber = pipe_response[0]
         package_ids = [int(num) for num in pipe_response[1]]
-        packages_queue_size = pipe_response[3]
+        packages_queue_size = pipe_response[2]
 
         print(LOG_PREFIX + 'Fetched {} packages from queue... ({} packages yet in queue)'.format(len(package_ids), packages_queue_size))
 
@@ -100,7 +100,8 @@ def run_packages_updater(redis):
             except AttributeError:
                 print(LOG_PREFIX + 'Didn\'t get any products, retrying in 5 seconds...')
                 time.sleep(5)
-            
+        
+        redis.ltrim('packages-queue', REDIS_BATCH_SIZE, -1)
         print(LOG_PREFIX + 'Batch completed, retry in 10 seconds...')
         time.sleep(10)
 
