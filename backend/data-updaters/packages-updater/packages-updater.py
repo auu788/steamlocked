@@ -48,8 +48,7 @@ def connect_to_steam():
     result = client.anonymous_login()
 
     if result != EResult.OK:
-        print(LOG_PREFIX + "Failed to login: {}".format(result))
-        raise SystemExit
+        raise Exception("Failed to login: {}".format(result))
     
     return client
 

@@ -33,8 +33,7 @@ def connect_to_steam():
     result = client.anonymous_login()
 
     if result != EResult.OK:
-        print("Failed to login: {}".format(result))
-        raise SystemExit
+        raise Exception("Failed to login: {}".format(result))
     
     return client
 
@@ -108,7 +107,7 @@ if __name__ == "__main__":
         if Consts.PACKAGES_MANUAL_END:
             update_queue_manually()
 
-        schedule.every(10).seconds.do(update_queue)
+        schedule.every(30).seconds.do(update_queue)
 
         while 1:
             schedule.run_pending()

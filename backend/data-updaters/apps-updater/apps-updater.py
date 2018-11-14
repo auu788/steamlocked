@@ -52,7 +52,7 @@ def get_release_date(appid):
             if response:
                 break
         except json.decoder.JSONDecodeError:
-            print (LOG_PREFIX + '[' + appid + '] Error while getting release date, retrying in 3 seconds...')
+            print (LOG_PREFIX + '[' + str(appid) + '] Error while getting release date, retrying in 3 seconds...')
             time.sleep(3)
 
     if response.get(str(appid), {}).get('success'):
@@ -237,8 +237,7 @@ def connect_to_steam():
     result = client.anonymous_login()
 
     if result != EResult.OK:
-        print("Failed to login: {}".format(result))
-        raise SystemExit
+        raise Exception("Failed to login: {}".format(result))
     
     return client
 
