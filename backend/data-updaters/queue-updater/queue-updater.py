@@ -30,10 +30,14 @@ class Consts:
 def connect_to_steam():
     client = SteamClient()
     
-    result = client.anonymous_login()
+    while True:
+        result = client.anonymous_login()
 
-    if result != EResult.OK:
-        raise Exception("Failed to login: {}".format(result))
+        if result == EResult.OK:
+            break
+        else:
+            print('Error while logging, retrying in 10 seconds...')
+            time.sleep(10)
     
     return client
 
