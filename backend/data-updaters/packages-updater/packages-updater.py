@@ -5,6 +5,7 @@ gevent.monkey.patch_all()
 import os
 import time
 import redis
+import traceback
 import sentry_sdk
 from steam import SteamClient
 from steam.enums import EResult
@@ -15,6 +16,9 @@ SENTRY_KEY = os.environ['SENTRY_KEY']
 SENTRY_PROJECT = os.environ['SENTRY_PROJECT']
 SENTRY_URL = "https://{}@sentry.io/{}".format(SENTRY_KEY, SENTRY_PROJECT)
 REDIS_BATCH_SIZE = 100
+
+# List of packages ids, which throws an error by internal libraries
+PACKAGES_BLACK_LIST = [82985]
 
 def handle_package(package, redis):
     print(LOG_PREFIX + 'Package: {}'.format(package.get('packageid')))
@@ -81,11 +85,12 @@ def run_packages_updater(redis):
 
         pipe_response = pipe.execute()
         changenumber = pipe_response[0]
-        package_ids = [int(num) for num in pipe_response[1]]
+        package_ids = [int(num) for num in pipe_response[1] if int(num) not in PACKAGES_BLACK_LIST]
         packages_queue_size = pipe_response[2]
 
         print(LOG_PREFIX + 'Fetched {} packages from queue... ({} packages yet in queue)'.format(len(package_ids), packages_queue_size))
 
+        print(package_ids)
         if not package_ids:
             time.sleep(5)
             continue
@@ -115,7 +120,8 @@ if __name__ == "__main__":
 
     sentry_sdk.init(
         SENTRY_URL,
-        server_name = 'packages-updater'
+        server_name = 'packages-updater',
+        shutdown_timeout = 5
     )
 
     try:
@@ -129,4 +135,5 @@ if __name__ == "__main__":
         run_packages_updater(r)
 
     except Exception as e:
+        traceback.print_exc()
         sentry_sdk.capture_exception(e)

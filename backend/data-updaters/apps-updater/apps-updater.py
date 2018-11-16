@@ -9,6 +9,7 @@ import time
 import redis
 import schedule
 import requests
+import traceback
 import sentry_sdk
 import pymysql.cursors
 from datetime import datetime
@@ -363,7 +364,8 @@ if __name__ == "__main__":
 
     sentry_sdk.init(
         SENTRY_URL,
-        server_name = 'apps-updater'
+        server_name = 'apps-updater',
+        shutdown_timeout = 5
     )
     
     try:
@@ -381,4 +383,5 @@ if __name__ == "__main__":
         run_apps_updater(r, client, sentry_sdk)
 
     except Exception as e:
+        traceback.print_exc()
         sentry_sdk.capture_exception(e)

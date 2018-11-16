@@ -6,6 +6,7 @@ import os
 import time
 import redis
 import schedule
+import traceback
 import sentry_sdk
 from steam import SteamClient
 from steam.enums import EResult
@@ -104,7 +105,8 @@ if __name__ == "__main__":
 
     sentry_sdk.init(
         Consts.SENTRY_URL,
-        server_name = 'queue-updater'
+        server_name = 'queue-updater',
+        shutdown_timeout = 5
     )
 
     try:
@@ -118,5 +120,5 @@ if __name__ == "__main__":
             time.sleep(1)
 
     except Exception as e:
-        print (e)
+        traceback.print_exc()
         sentry_sdk.capture_exception(e)
