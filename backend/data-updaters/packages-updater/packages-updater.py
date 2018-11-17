@@ -4,24 +4,23 @@ gevent.monkey.patch_all()
 
 import os
 import time
+import json
 import redis
 import traceback
 import sentry_sdk
 from steam import SteamClient
 from steam.enums import EResult
 
-LOG_PREFIX = "[packages-updater] "
+class Consts:
+    LOG_PREFIX = "[packages-updater]"
 
-SENTRY_KEY = os.environ['SENTRY_KEY']
-SENTRY_PROJECT = os.environ['SENTRY_PROJECT']
-SENTRY_URL = "https://{}@sentry.io/{}".format(SENTRY_KEY, SENTRY_PROJECT)
-REDIS_BATCH_SIZE = 100
-
-# List of packages ids, which throws an error by internal libraries
-PACKAGES_BLACK_LIST = [82985]
+    SENTRY_KEY = os.environ['SENTRY_KEY']
+    SENTRY_PROJECT = os.environ['SENTRY_PROJECT']
+    SENTRY_URL = "https://{}@sentry.io/{}".format(SENTRY_KEY, SENTRY_PROJECT)
+    REDIS_BATCH_SIZE = 100
 
 def handle_package(package, redis):
-    print(LOG_PREFIX + 'Package: {}'.format(package.get('packageid')))
+    print('{} Package: {}'.format(Consts.LOG_PREFIX, package.get('packageid')))
     package_id = package.get('packageid')
     billing_type = package.get('billingtype')
     allow_cross_region_trading_and_gifting = str2bool(package.get('extended', {}).get('allowcrossregiontradingandgifting'))
@@ -44,7 +43,7 @@ def handle_package(package, redis):
             "package": package_json
         }
 
-        redis.rpush('apps-queue', app)
+        redis.rpush('apps-queue', json.dumps(app))
 
 def connect_to_steam():
     client = SteamClient()
@@ -55,7 +54,7 @@ def connect_to_steam():
         if result == EResult.OK:
             break
         else:
-            print(LOG_PREFIX + 'Error while logging, retrying in 10 seconds...')
+            print('{} Error while logging, retrying in 10 seconds...'.format(Consts.LOG_PREFIX))
             time.sleep(10)
 
     return client
@@ -80,17 +79,16 @@ def run_packages_updater(redis):
         pipe = redis.pipeline()
 
         pipe.get('current_change')
-        pipe.lrange('packages-queue', 0, REDIS_BATCH_SIZE - 1)
+        pipe.lrange('packages-queue', 0, Consts.REDIS_BATCH_SIZE - 1)
         pipe.llen('packages-queue')
 
         pipe_response = pipe.execute()
         changenumber = pipe_response[0]
-        package_ids = [int(num) for num in pipe_response[1] if int(num) not in PACKAGES_BLACK_LIST]
+        package_ids = [int(num) for num in pipe_response[1]]
         packages_queue_size = pipe_response[2]
 
-        print(LOG_PREFIX + 'Fetched {} packages from queue... ({} packages yet in queue)'.format(len(package_ids), packages_queue_size))
+        print('{} Fetched {} packages from queue... ({} packages yet in queue)'.format(Consts.LOG_PREFIX, len(package_ids), packages_queue_size))
 
-        print(package_ids)
         if not package_ids:
             time.sleep(5)
             continue
@@ -106,26 +104,26 @@ def run_packages_updater(redis):
                 
                 break
             except AttributeError:
-                print(LOG_PREFIX + 'Didn\'t get any products, retrying in 5 seconds...')
+                print('{} Didn\'t get any products, retrying in 5 seconds...'.format(Consts.LOG_PREFIX))
                 time.sleep(5)
         
-        redis.ltrim('packages-queue', REDIS_BATCH_SIZE, -1)
-        print(LOG_PREFIX + 'Batch completed, retry in 10 seconds...')
+        redis.ltrim('packages-queue', Consts.REDIS_BATCH_SIZE, -1)
+        print('{} Batch completed, retry in 10 seconds...'.format(Consts.LOG_PREFIX))
         time.sleep(10)
 
 if __name__ == "__main__":
-    print(LOG_PREFIX + 'Starting in 15 seconds...')
+    print('{} Starting in 15 seconds...'.format(Consts.LOG_PREFIX))
     time.sleep(15)
-    print(LOG_PREFIX + 'Starting...')
+    print('{} Starting...'.format(Consts.LOG_PREFIX))
 
     sentry_sdk.init(
-        SENTRY_URL,
+        Consts.SENTRY_URL,
         server_name = 'packages-updater',
         shutdown_timeout = 5
     )
 
     try:
-        r = redis.StrictRedis(
+        r = redis.Redis(
             host='redis',
             port=6379,
             db=0,

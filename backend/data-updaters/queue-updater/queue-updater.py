@@ -4,6 +4,7 @@ gevent.monkey.patch_all()
 
 import os
 import time
+import json
 import redis
 import schedule
 import traceback
@@ -12,7 +13,7 @@ from steam import SteamClient
 from steam.enums import EResult
 
 class Consts:
-    LOG_PREFIX = "[queue-updater] "
+    LOG_PREFIX = "[queue-updater]"
 
     MYSQL_HOST = "mariadb"
     MYSQL_DATABASE = os.environ['MYSQL_DATABASE']
@@ -37,15 +38,15 @@ def connect_to_steam():
         if result == EResult.OK:
             break
         else:
-            print('Error while logging, retrying in 10 seconds...')
+            print('{} Error while logging, retrying in 10 seconds...'.format(Consts.LOG_PREFIX))
             time.sleep(10)
     
     return client
 
 def update_queue():
-    print(Consts.LOG_PREFIX + 'Checking queue...')
+    print('{} Checking queue...'.format(Consts.LOG_PREFIX))
 
-    r = redis.StrictRedis(host='redis', port=6379, db=0, charset="utf-8", decode_responses=True)
+    r = redis.Redis(host='redis', port=6379, db=0, charset="utf-8", decode_responses=True)
     
     changenumber_to_fetch = None
 
@@ -63,23 +64,23 @@ def update_queue():
         if res is not None:
             break
         else:
-            print(Consts.LOG_PREFIX + 'Changes response is None, retrying in 3 seconds...')
+            print('{} Changes response is None, retrying in 3 seconds...'.format(Consts.LOG_PREFIX))
             time.sleep(3)
 
-    print(Consts.LOG_PREFIX + '[{}] Fetched {} package changes and {} app changes...'.format(res.current_change_number, len(res.package_changes), len(res.app_changes)))
+    print('{} [{}] Fetched {} package changes and {} app changes...'.format(Consts.LOG_PREFIX, res.current_change_number, len(res.package_changes), len(res.app_changes)))
 
     redis_pipe = r.pipeline()
     for package_change in res.package_changes:
         redis_pipe.rpush('packages-queue', package_change.packageid)
-        print(Consts.LOG_PREFIX + 'PACKAGE {} - {}'.format(package_change.packageid, package_change.change_number))
+        print('{} PACKAGE {} - {}'.format(Consts.LOG_PREFIX, package_change.packageid, package_change.change_number))
 
     for app_change in res.app_changes:
         app_json = {
             "app_id": app_change.appid,
             "package": {}
         }
-        redis_pipe.rpush('apps-queue', app_json)
-        print(Consts.LOG_PREFIX + 'APP {} - {}'.format(app_change.appid, app_change.change_number))
+        redis_pipe.rpush('apps-queue', json.dumps(app_json))
+        print('{} APP {} - {}'.format(Consts.LOG_PREFIX, app_change.appid, app_change.change_number))
 
     redis_pipe.set('current_change_number', res.current_change_number)
     redis_pipe.execute()
@@ -87,7 +88,7 @@ def update_queue():
     client.logout()
 
 def update_queue_manually():
-    r = redis.StrictRedis(host='redis', port=6379, db=0, charset="utf-8", decode_responses=True)
+    r = redis.Redis(host='redis', port=6379, db=0, charset="utf-8", decode_responses=True)
 
     range_start = int(Consts.PACKAGES_MANUAL_START) if Consts.PACKAGES_MANUAL_START else 0
 
@@ -96,12 +97,12 @@ def update_queue_manually():
         redis_pipe.rpush('packages-queue', package_num)
     redis_pipe.execute()
 
-    print(Consts.LOG_PREFIX + 'Updated queue with numbers from {} to {}...'.format(range_start, Consts.PACKAGES_MANUAL_END))
+    print('{} Updated queue with numbers from {} to {}...'.format(Consts.LOG_PREFIX, range_start, Consts.PACKAGES_MANUAL_END))
 
 if __name__ == "__main__":
-    print(Consts.LOG_PREFIX + 'Starting in 15 seconds...')
+    print('{} Starting in 15 seconds...'.format(Consts.LOG_PREFIX))
     time.sleep(15)
-    print(Consts.LOG_PREFIX + 'Starting...')
+    print('{} Starting...'.format(Consts.LOG_PREFIX))
 
     sentry_sdk.init(
         Consts.SENTRY_URL,

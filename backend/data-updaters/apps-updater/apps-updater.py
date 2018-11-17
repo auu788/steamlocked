@@ -16,23 +16,27 @@ from datetime import datetime
 from steam import SteamClient
 from steam.enums import EResult
 
-LOG_PREFIX = "[apps-updater] "
-REDIS_BATCH_SIZE = 50
+class Consts:
+    LOG_PREFIX = "[apps-updater]"
+    REDIS_BATCH_SIZE = 50
 
-MYSQL_HOST = "mariadb"
-MYSQL_DATABASE = os.environ['MYSQL_DATABASE']
-MYSQL_USER = os.environ['MYSQL_USER']
-MYSQL_PASSWORD = os.environ['MYSQL_PASSWORD']
+    MYSQL_HOST = "mariadb"
+    MYSQL_DATABASE = os.environ['MYSQL_DATABASE']
+    MYSQL_USER = os.environ['MYSQL_USER']
+    MYSQL_PASSWORD = os.environ['MYSQL_PASSWORD']
 
-SENTRY_KEY = os.environ['SENTRY_KEY']
-SENTRY_PROJECT = os.environ['SENTRY_PROJECT']
-SENTRY_URL = "https://{}@sentry.io/{}".format(SENTRY_KEY, SENTRY_PROJECT)
+    SENTRY_KEY = os.environ['SENTRY_KEY']
+    SENTRY_PROJECT = os.environ['SENTRY_PROJECT']
+    SENTRY_URL = "https://{}@sentry.io/{}".format(SENTRY_KEY, SENTRY_PROJECT)
 
 def list_of_jsons_to_json(dict_list):
     result = {}
 
     for item in dict_list:
-        item = ast.literal_eval(item)
+        try:
+            item = json.loads(item)
+        except json.decoder.JSONDecodeError:
+            item = ast.literal_eval(item)
 
         if item["package"]:
             if result.get(item["app_id"]):
@@ -53,7 +57,7 @@ def get_release_date(appid):
             if response:
                 break
         except json.decoder.JSONDecodeError:
-            print (LOG_PREFIX + '[' + str(appid) + '] Error while getting release date, retrying in 3 seconds...')
+            print('{} [{}] Error while getting release date, retrying in 3 seconds...'.format(Consts.LOG_PREFIX, str(appid)))
             time.sleep(3)
 
     if response.get(str(appid), {}).get('success'):
@@ -63,17 +67,17 @@ def get_release_date(appid):
 
 def handle_db_connection():
     conn = pymysql.connect(
-        host=MYSQL_HOST,
-        user=MYSQL_USER,
-        password=MYSQL_PASSWORD,
-        db=MYSQL_DATABASE,
+        host=Consts.MYSQL_HOST,
+        user=Consts.MYSQL_USER,
+        password=Consts.MYSQL_PASSWORD,
+        db=Consts.MYSQL_DATABASE,
         charset='utf8mb4',
         cursorclass=pymysql.cursors.DictCursor)
                             
     return conn
 
 def update_db_with_app(app):
-    print(LOG_PREFIX + 'App: {}'.format(str(app['app_id'])))
+    print('{} App: {}'.format(Consts.LOG_PREFIX, str(app['app_id'])))
 
     conn = handle_db_connection()
     updated_at = datetime.utcnow()
@@ -123,7 +127,7 @@ def update_db_with_app(app):
         conn.close()
         
 def update_db_with_existing_app(app):
-    print(LOG_PREFIX + 'Existing app: {}'.format(str(app['app_id'])))
+    print('{} Existing app: {}'.format(Consts.LOG_PREFIX, str(app['app_id'])))
 
     conn = handle_db_connection()
     updated_at = datetime.utcnow()
@@ -160,7 +164,7 @@ def update_db_with_existing_app(app):
         conn.close()
 
 def update_db_with_package(package, app_id):
-    print(LOG_PREFIX + 'Package: {} - {}'.format(app_id, str(package['package_id'])))
+    print('{} Package: {} - {}'.format(Consts.LOG_PREFIX, app_id, str(package['package_id'])))
     conn = handle_db_connection()
     updated_at = datetime.utcnow()
 
@@ -241,7 +245,7 @@ def connect_to_steam():
         if result == EResult.OK:
             break
         else:
-            print(LOG_PREFIX + 'Error while logging, retrying in 10 seconds...')
+            print('{} Error while logging, retrying in 10 seconds...'.format(Consts.LOG_PREFIX))
             time.sleep(10)
     
     return client
@@ -251,7 +255,7 @@ def is_valid_app(app):
     apptype = app.get('common', {}).get('type', '').lower()
 
     if (apptype != 'game' and apptype != 'dlc') or releasestate == 'prerelease':
-        print(LOG_PREFIX + '[{}] releasestate: {}, apptype: {}'.format(app.get('appid'), releasestate, apptype))
+        print('{} [{}] releasestate: {}, apptype: {}'.format(Consts.LOG_PREFIX, app.get('appid'), releasestate, apptype))
         return False
     
     return True
@@ -263,7 +267,7 @@ def str2bool(v):
     return False
 
 def update_db_with_new_released_app(app):
-    print(LOG_PREFIX + '[' + str(app['id']) + '] New released app: ' + app['name'])
+    print('{} [{}] New released app: {}'.format(Consts.LOG_PREFIX, str(app['id']), app['name']))
     conn = handle_db_connection()
 
     try:
@@ -284,7 +288,7 @@ def update_db_with_new_released_app(app):
         conn.close()
 
 def update_new_releases():
-    print(LOG_PREFIX + 'Getting new releases...')
+    print('{} Getting new releases...'.format(Consts.LOG_PREFIX))
     STEAM_API_FEATURED = "http://store.steampowered.com/api/featuredcategories"
 
     while True:
@@ -292,11 +296,11 @@ def update_new_releases():
             response = requests.get(STEAM_API_FEATURED).json()
             break
         except json.decoder.JSONDecodeError:
-            print(LOG_PREFIX + 'Error while getting new releases, retrying in 3 seconds...')
+            print('{} Error while getting new releases, retrying in 3 seconds...'.format(Consts.LOG_PREFIX))
             time.sleep(3)
     
     new_releases = response.get('new_releases', {}).get('items', [])
-    print(LOG_PREFIX + 'Fetched {} new released games'.format(len(new_releases)))
+    print('{} Fetched {} new released games'.format(Consts.LOG_PREFIX, len(new_releases)))
 
     for app in new_releases:
         update_db_with_new_released_app(app)    
@@ -307,18 +311,17 @@ def run_apps_updater(redis, client, sentry_sdk):
         pipe = redis.pipeline()
 
         pipe.get('current_change')
-        pipe.lrange('apps-queue', 0, REDIS_BATCH_SIZE - 1)
+        pipe.lrange('apps-queue', 0, Consts.REDIS_BATCH_SIZE - 1)
         pipe.llen('apps-queue')
 
         pipe_response = pipe.execute()
 
         changenumber = pipe_response[0]
-        apps = [app for app in pipe_response[1]]
-        app_to_packages = list_of_jsons_to_json(apps)
+        app_to_packages = list_of_jsons_to_json(pipe_response[1])
         app_ids = app_to_packages.keys()
         apps_queue_size = pipe_response[2]
 
-        print(LOG_PREFIX + 'Fetched {} apps from queue... ({} apps yet in queue)'.format(len(app_ids), apps_queue_size))
+        print('{} Fetched {} apps from queue... ({} apps yet in queue)'.format(Consts.LOG_PREFIX, len(app_ids), apps_queue_size))
         
         if not app_ids:
             time.sleep(5)
@@ -336,7 +339,7 @@ def run_apps_updater(redis, client, sentry_sdk):
                     if data is not None:
                         break
                     else:
-                        print(LOG_PREFIX + 'Data is None, retrying in 3 seconds...')
+                        print('{} Data is None, retrying in 3 seconds...'.format(Consts.LOG_PREFIX))
                         time.sleep(3)
                         client = connect_to_steam()
 
@@ -349,21 +352,21 @@ def run_apps_updater(redis, client, sentry_sdk):
                 sentry_sdk.capture_exception(e)
                 break
             except AttributeError as e:
-                print(LOG_PREFIX + 'Didn\'t get any apps, retrying in 5 seconds...')
+                print('{} Didn\'t get any apps, retrying in 5 seconds...'.format(Consts.LOG_PREFIX))
                 sentry_sdk.capture_exception(e)
                 time.sleep(5)
         
-        redis.ltrim('apps-queue', REDIS_BATCH_SIZE, -1)
-        print(LOG_PREFIX + 'Batch completed, retry in 3 seconds...')
+        redis.ltrim('apps-queue', Consts.REDIS_BATCH_SIZE, -1)
+        print('{} Batch completed, retry in 3 seconds...'.format(Consts.LOG_PREFIX))
         time.sleep(3)
 
 if __name__ == "__main__":
-    print(LOG_PREFIX + 'Starting in 15 seconds...')
+    print('{} Starting in 15 seconds...'.format(Consts.LOG_PREFIX))
     time.sleep(15)
-    print(LOG_PREFIX + 'Starting...')
+    print('{} Starting...'.format(Consts.LOG_PREFIX))
 
     sentry_sdk.init(
-        SENTRY_URL,
+        Consts.SENTRY_URL,
         server_name = 'apps-updater',
         shutdown_timeout = 5
     )
@@ -371,7 +374,7 @@ if __name__ == "__main__":
     try:
         schedule.every(10).minutes.do(update_new_releases)
 
-        r = redis.StrictRedis(
+        r = redis.Redis(
             host='redis',
             port=6379,
             db=0,
