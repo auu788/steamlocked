@@ -6,11 +6,11 @@ RUN wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSI
     && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
     && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
 
-COPY . /app
-WORKDIR /app
-
 RUN python -m pip install gevent
 RUN pip install pymysql
+
+COPY . /app
+WORKDIR /app
 
 CMD ["dockerize", "-wait", "tcp://mariadb:3306"] 
 CMD ["python", "-u", "./db-setup.py"]

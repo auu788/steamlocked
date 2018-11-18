@@ -266,8 +266,20 @@ def str2bool(v):
     
     return False
 
+def clear_new_released_db():
+    conn = handle_db_connection()
+
+    try:
+        with conn.cursor() as cursor:
+            sql = "DELETE * FROM `new_releases`"
+        
+        conn.commit()
+    finally:
+        conn.close()
+
 def update_db_with_new_released_app(app):
     print('{} [{}] New released app: {}'.format(Consts.LOG_PREFIX, str(app['id']), app['name']))
+
     conn = handle_db_connection()
 
     try:
@@ -302,6 +314,9 @@ def update_new_releases():
     new_releases = response.get('new_releases', {}).get('items', [])
     print('{} Fetched {} new released games'.format(Consts.LOG_PREFIX, len(new_releases)))
 
+    if len(new_releases) > 0:
+        clear_new_released_db()
+
     for app in new_releases:
         update_db_with_new_released_app(app)    
 
@@ -327,8 +342,6 @@ def run_apps_updater(redis, client, sentry_sdk):
             time.sleep(5)
             continue
 
-        print(app_ids)
-
         while True:
             try:
                 # run new-releases updater every n minutes
@@ -348,16 +361,13 @@ def run_apps_updater(redis, client, sentry_sdk):
                         handle_app(app, app_to_packages)
                 
                 break
-            except UnicodeDecodeError as e:
-                sentry_sdk.capture_exception(e)
-                break
             except AttributeError as e:
                 print('{} Didn\'t get any apps, retrying in 5 seconds...'.format(Consts.LOG_PREFIX))
                 sentry_sdk.capture_exception(e)
                 time.sleep(5)
         
         redis.ltrim('apps-queue', Consts.REDIS_BATCH_SIZE, -1)
-        print('{} Batch completed, retry in 3 seconds...'.format(Consts.LOG_PREFIX))
+        print('{} Batch completed, retrying in 3 seconds...'.format(Consts.LOG_PREFIX))
         time.sleep(3)
 
 if __name__ == "__main__":

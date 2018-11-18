@@ -27,7 +27,7 @@ conn = pymysql.connect(
 
 try:
     with conn.cursor() as cursor:
-        database_collation = "ALTER DATABASE `test-db` \
+        database_collation = "ALTER DATABASE `" + MYSQL_DATABASE + "` \
             CHARACTER SET `utf8mb4` \
             COLLATE `utf8mb4_unicode_ci`"
 
