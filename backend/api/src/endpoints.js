@@ -41,7 +41,7 @@ export const getSearchResults = async (req, res, next) => {
     console.log(`[REQUEST] ${req.url}`);
 	res.header("Access-Control-Allow-Origin", "*");
 	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    let searchQuery = req.params["searchQuery"];
+    let searchQuery = escape(req.params["searchQuery"]);
 
     // Preparing query for SQL's boolean mode search
     let preparedQuery = '+*' + searchQuery + '*';
@@ -75,7 +75,7 @@ export const getAppidInfo = async (req, res, next) => {
     console.log(`[REQUEST] ${req.url}`);
 	res.header("Access-Control-Allow-Origin", "*");
 	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    const appid = req.params['appid'];
+    const appid = escape(req.params['appid']);
 
     let infoQuery = "SELECT DISTINCT appid, name, type, developer, publisher, release_date, dlcforappid, 'base_name' \
                     FROM apps \

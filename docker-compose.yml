@@ -20,6 +20,8 @@ services:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
   api:
     build: ./backend/api
+    volumes:
+      - ${PWD}/data/api-logs:/root/.npm/_logs
     depends_on:
       - mariadb
     environment:
