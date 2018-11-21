@@ -59,6 +59,9 @@ def get_release_date(appid):
         except json.decoder.JSONDecodeError:
             print('{} [{}] Error while getting release date, retrying in 3 seconds...'.format(Consts.LOG_PREFIX, str(appid)))
             time.sleep(3)
+        except requests.exceptions.ConnectionError:
+            print('{} [{}] Error while getting release date, retrying in 5 seconds...'.format(Consts.LOG_PREFIX, str(appid)))
+            time.sleep(5)
 
     if response.get(str(appid), {}).get('success'):
         return response.get(str(appid), {}).get('data', {}).get('release_date', {}).get('date')
