@@ -25,9 +25,9 @@ export const getNewReleases = async (req, res, next) => {
                     WHERE appid IN \
                         (SELECT appid \
                         FROM apps \
-                        WHERE type='Game' AND \
+                        WHERE type='game' AND \
                             isfreeapp IS NULL AND \
-                            (releasestate<>'prerelease' or releasestate IS NULL))";
+                            (releasestate = 'released' or releasestate IS NULL))";
     
     db.query(sqlQuery, (err, results) => {
         res.status(200).json({
@@ -49,8 +49,8 @@ export const getSearchResults = async (req, res, next) => {
 
     let sqlQuery = "SELECT appid, name, type \
                     FROM apps \
-                    WHERE (releasestate <> 'prerelease' OR releasestate IS NULL) AND \
-                        (appid = ? OR name LIKE ? OR MATCH(name) AGAINST (? IN BOOLEAN MODE)) \
+                    WHERE (releasestate = 'released' OR releasestate IS NULL) AND \
+                        (name LIKE ? OR MATCH(name) AGAINST (? IN BOOLEAN MODE)) \
                     ORDER BY MATCH(name) AGAINST (? IN BOOLEAN MODE) DESC LIMIT 150";
 
     db.query(sqlQuery, [searchQuery, '%'+searchQuery+'%', preparedQuery, preparedQuery], (err, results) => {
@@ -87,9 +87,9 @@ export const getAppidInfo = async (req, res, next) => {
         return;
     }
     
-    let infoQuery = "SELECT DISTINCT appid, name, type, developer, publisher, release_date, dlcforappid, 'base_name' \
+    let infoQuery = "SELECT DISTINCT appid, name, UPPER(type) as type, developer, publisher, release_date, dlcforappid, 'base_name' \
                     FROM apps \
-                    WHERE (releasestate<>'prerelease' or releasestate IS NULL) AND appid = ?";
+                    WHERE (releasestate = 'released' or releasestate IS NULL) AND appid = ?";
     
     let packagesQuery = "SELECT subid, billingtype, AllowPurchaseFromRestrictedCountries, PurchaseRestrictedCountries, AllowCrossRegionTradingAndGifting, onlyallowrunincountries \
                         FROM packages \
@@ -113,7 +113,7 @@ export const getAppidInfo = async (req, res, next) => {
 			
 			let baseNameForDlcQuery =	"SELECT name \
 										FROM apps \
-										WHERE appid = ? AND type = 'Game'";
+										WHERE appid = ? AND type = 'game'";
 			
 			db.query(baseNameForDlcQuery, dlcForAppid, (err, baseNameResult) => {
 				if (err) throw err;
@@ -189,7 +189,7 @@ export const getList = async (req, res, next) => {
                     FROM apps \
                     JOIN packages ON apps.appid = packages.appid \
                     WHERE type = 'game' AND AllowPurchaseFromRestrictedCountries = 1 \
-                        AND (releasestate <> 'prerelease' OR releasestate IS NULL) \
+                        AND (releasestate = 'released' OR releasestate IS NULL) \
                         AND PurchaseRestrictedCountries LIKE ? \
                         " + billingtypeSqlQuery + " \
                     ORDER BY name"
