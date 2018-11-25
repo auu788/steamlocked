@@ -97,7 +97,7 @@ export const getAppidInfo = async (req, res, next) => {
 
     db.query(infoQuery, appid, (err, appResults) => {
         if (err) throw err;
-        
+
         if (appResults.length === 0) {
             res.status(400).json({
                 "success": false,
