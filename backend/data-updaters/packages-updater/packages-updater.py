@@ -96,7 +96,7 @@ def run_packages_updater(redis):
         while True:
             client = connect_to_steam()
             try:
-                data = client.get_product_info(packages=package_ids)
+                data = client.get_product_info(packages=package_ids, timeout=300)
 
                 for package in data.get('packages', {}).values():
                     if is_valid_package(package):

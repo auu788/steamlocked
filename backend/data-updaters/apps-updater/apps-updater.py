@@ -351,7 +351,7 @@ def run_apps_updater(redis, client, sentry_sdk):
                 schedule.run_pending()
                 
                 while True:
-                    data = client.get_product_info(apps=app_ids)
+                    data = client.get_product_info(apps=app_ids, timeout=300)
                     if data is not None:
                         break
                     else:
