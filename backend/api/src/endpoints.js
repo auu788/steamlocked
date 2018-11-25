@@ -75,8 +75,18 @@ export const getAppidInfo = async (req, res, next) => {
     console.log(`[REQUEST] ${req.url}`);
 	res.header("Access-Control-Allow-Origin", "*");
 	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    const appid = escape(req.params['appid']);
+    const appid = req.params['appid'];
 
+    if (!/^\d+$/.test(appid)) {
+        res.status(400).json({
+            "success": false,
+            "appid": appid,
+            "info": "Appid has to be an integer."
+        });
+
+        return;
+    }
+    
     let infoQuery = "SELECT DISTINCT appid, name, type, developer, publisher, release_date, dlcforappid, 'base_name' \
                     FROM apps \
                     WHERE (releasestate<>'prerelease' or releasestate IS NULL) AND appid = ?";
@@ -178,8 +188,8 @@ export const getList = async (req, res, next) => {
     let sqlQuery = "SELECT DISTINCT apps.appid, name \
                     FROM apps \
                     JOIN packages ON apps.appid = packages.appid \
-                    WHERE type = 'Game' AND AllowPurchaseFromRestrictedCountries = 1 \
-                        AND (releasestate <> 'prerelase' OR releasestate IS NULL) \
+                    WHERE type = 'game' AND AllowPurchaseFromRestrictedCountries = 1 \
+                        AND (releasestate <> 'prerelease' OR releasestate IS NULL) \
                         AND PurchaseRestrictedCountries LIKE ? \
                         " + billingtypeSqlQuery + " \
                     ORDER BY name"
