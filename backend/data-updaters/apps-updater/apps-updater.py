@@ -254,11 +254,10 @@ def connect_to_steam():
     return client
 
 def is_valid_app(app):
-    releasestate = app.get('common', {}).get('releasestate', '').lower()
     apptype = app.get('common', {}).get('type', '').lower()
 
-    if (apptype != 'game' and apptype != 'dlc') or releasestate == 'prerelease':
-        print('{} [{}] releasestate: {}, apptype: {}'.format(Consts.LOG_PREFIX, app.get('appid'), releasestate, apptype))
+    if (apptype != 'game' and apptype != 'dlc'):
+        print('{} [{}] apptype: {}'.format(Consts.LOG_PREFIX, app.get('appid'), apptype))
         return False
     
     return True
@@ -274,8 +273,9 @@ def clear_new_released_db():
 
     try:
         with conn.cursor() as cursor:
-            sql = "DELETE * FROM `new_releases`"
-        
+            sql = "DELETE FROM `new_releases`"
+            cursor.execute(sql)
+            
         conn.commit()
     finally:
         conn.close()
@@ -383,7 +383,7 @@ if __name__ == "__main__":
         server_name = 'apps-updater',
         shutdown_timeout = 5
     )
-    
+
     try:
         schedule.every(10).minutes.do(update_new_releases)
 
