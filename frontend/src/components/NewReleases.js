@@ -14,7 +14,7 @@ class NewReleases extends Component {
     }
 
     componentDidMount() {
-        const url = 'https://apibeta.steamlocked.com/newReleases';
+        const url = 'https://api.steamlocked.com/newReleases';
 
         axios.get(url)
         .then((response) => {

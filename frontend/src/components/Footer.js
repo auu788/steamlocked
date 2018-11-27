@@ -14,7 +14,7 @@ class Footer extends Component {
     }
 
     componentDidMount() {
-        const url = 'https://apibeta.steamlocked.com/timeUpdate';
+        const url = 'https://api.steamlocked.com/timeUpdate';
         
         axios.get(url)
         .then((response) => {
