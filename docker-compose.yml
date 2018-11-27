@@ -20,6 +20,7 @@ services:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
   api:
     build: ./backend/api
+    restart: on-failure
     volumes:
       - ${PWD}/data/api-logs:/root/.npm/_logs
     depends_on:
