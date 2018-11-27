@@ -117,8 +117,13 @@ export const getAppidInfo = async (req, res, next) => {
 			
 			db.query(baseNameForDlcQuery, dlcForAppid, (err, baseNameResult) => {
 				if (err) throw err;
+                
+                if (baseNameResult.length > 0) {
+                    appResults[0]["base_name"] = baseNameResult[0].name;
+                } else {
+                    appResults[0]["base_name"] = null;
+                }
 				
-				appResults[0]["base_name"] = baseNameResult[0].name;
 			});
 		}
 		else {
