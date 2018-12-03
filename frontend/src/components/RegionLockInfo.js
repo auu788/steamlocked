@@ -126,13 +126,13 @@ class RegionLockInfoWrapper extends Component {
             }
 
             if (one.PurchaseRestrictedCountries) {
-                one.PurchaseRestrictedCountries = one.PurchaseRestrictedCountries.replace(/,/g, ' ').trim();
+                one.PurchaseRestrictedCountries = one.PurchaseRestrictedCountries.replace(/(\s|,)/g, ' ').trim();
 
                 if (!_.includes(one.PurchaseRestrictedCountries, userCountryCode)
                     && one.AllowPurchaseFromRestrictedCountries === 1) 
                 {
                     regionLocked = true;
-                    one.PurchaseRestrictedCountries = one.PurchaseRestrictedCountries.replace(/,/g, ' ');
+                    one.PurchaseRestrictedCountries = one.PurchaseRestrictedCountries.replace(/(\s|,)/g, ' ');
 
                     if (one.billingtype === 3 || one.billingtype === 10) {
                         keyLockedCountries.push(...one.PurchaseRestrictedCountries.split(' '));    
@@ -144,7 +144,7 @@ class RegionLockInfoWrapper extends Component {
                     && one.AllowPurchaseFromRestrictedCountries === 0)
                 {
                     regionLocked = true;
-                    one.PurchaseRestrictedCountries = one.PurchaseRestrictedCountries.replace(/,/g, ' ');
+                    one.PurchaseRestrictedCountries = one.PurchaseRestrictedCountries.replace(/(\s|,)/g, ' ');
 
                     if (one.billingtype === 3 || one.billingtype === 10) {
                         keyBannedCountries.push(...one.PurchaseRestrictedCountries.split(' '));
@@ -157,7 +157,7 @@ class RegionLockInfoWrapper extends Component {
 
                 if (!_.includes(one.onlyallowrunincountries, userCountryCode)) {
                     regionLocked = true;
-                    one.onlyallowrunincountries = one.onlyallowrunincountries.replace(/,/g, ' ');                    
+                    one.onlyallowrunincountries = one.onlyallowrunincountries.replace(/(\s|,)/g, ' ');                    
 
                     if (one.billingtype === 3 || one.billingtype === 10) {
                         keyRunLockedCountries.push(...one.onlyallowrunincountries.split(' '));
