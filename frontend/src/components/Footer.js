@@ -28,7 +28,7 @@ class Footer extends Component {
         return (
             <footer id="footer">
                 <div id="footer-content">
-                    <span>Made by <a href="https://pawel.znamiec.me">Paweł Znamiec</a></span>
+                    <span>Made by <a href="mailto:pawel@znamiec.me">Paweł Znamiec</a></span>
                     <span>Last update: <TimeAgo date={new Date(this.state.time)} live={false}/></span>
                 </div>
                 <span id="disclaimer">All data is powered by Steam. Not affiliated with Valve, Steam, or any of their partners. All copyrights reserved to their respective owners.</span>
