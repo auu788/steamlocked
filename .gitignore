@@ -186,3 +186,4 @@ dist
 .vscode/settings.json
 
 things
+package-lock.json
